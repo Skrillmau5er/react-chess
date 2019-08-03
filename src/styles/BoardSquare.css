@@ -1,0 +1,20 @@
+.board-square{
+  max-width: 50px;
+  width: 12.5%;
+  height: 50px;
+  max-height: 50px;
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.grey{
+  background: #ccc;
+}
+
+.active {
+  background: #8aceff;
+}
+
+.path{
+  background: red;
+}
