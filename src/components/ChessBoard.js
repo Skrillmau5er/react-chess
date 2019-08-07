@@ -18,16 +18,20 @@ class ChessBoard extends React.Component {
   };
 
   handlePieceClick = (piece) => {
+    //Set active piece
     if(!(this.state.activePiece) && (piece.piece) && (piece.player === this.state.turn)){
-      this.setState({ currentPath : piece.piece.getPath(piece.pieceID, piece.player) })
+      this.setState({ currentPath : piece.piece.getPath(piece, this.state.board) })
       this.setActivePiece(piece,'set');
     }
+    //Unset active piece by clicking it
     else if(this.state.activePiece === piece){
       this.setActivePiece(piece,'unset');
     }
-    else if(this.state.activePiece !== piece && (this.state.activePiece)){
+    //Move piece if possible
+    else if(this.state.activePiece !== piece && (this.state.activePiece) && this.pieceInPath(piece)){
       this.movePiece(piece);
     }
+    //Remove active state by clicking outside of path
     else if((this.state.activePiece)){
       this.setActivePiece(piece, 'unset');
     }
@@ -39,6 +43,10 @@ class ChessBoard extends React.Component {
     }else{
       this.setState({ activePiece: null, currentPath: [] })
     }
+  }
+
+  pieceInPath = (piece) => {
+    return this.state.currentPath.includes(piece.pieceID)
   }
 
   movePiece = (piece) => {

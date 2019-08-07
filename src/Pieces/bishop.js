@@ -1,36 +1,27 @@
 import piece from './piece'
 export default class bishop extends piece {
-  getPath(piece){
+  getPath(piece, board){
     let path = [];
-    let modPiece = piece % 8;
-    if(modPiece !== 0){
-      modPiece = 8 - modPiece;
-      modPiece *= 2;
-      for(let i = 0; i < modPiece; i += 2){
-        if(i === 0){
-        path.push(piece + 9);
-        path.push(piece - 7);
-        }
-        else{
-          path.push(path[i-2] + 9);
-          path.push(path[i-1] - 7);
-        }
-      }
+    let currCol = piece.pieceID % 8;
+    let leftUp, leftDown, rightUp, rightDown;
+    leftUp = leftDown = rightUp = rightDown = piece.pieceID;
+    if(currCol === 0) currCol = 8;
+
+    //Get path to left of piece
+    for(let i = currCol; i > 1; i--){
+      leftUp += 7;
+      leftDown -= 9;
+      path.push(leftUp);
+      if(leftDown) path.push(leftDown);
     }
-    modPiece = piece % 8;
-    if(modPiece !== 1){
-      modPiece *= 2;
-      for(let i = modPiece; i > 0 ; i -= 2){
-        if(i === modPiece){
-        path.push(piece + 7);
-        path.push(piece - 9);
-        }
-        else{
-          path.push(path[i-2] + 9);
-          path.push(path[i-1] - 7);
-        }
-      }
-      return path;
+
+    //Get path right of piece
+    for(let i = currCol; i < 8; i++){
+      rightUp += 9;
+      rightDown -= 7;
+      path.push(rightUp);
+      if(rightDown) path.push(rightDown);
     }
+    return path;
   }
 }

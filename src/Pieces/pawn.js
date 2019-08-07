@@ -9,24 +9,25 @@ export default class pawn extends piece {
     return this.firstMove;
   }
   
-  getPath(piece,player){
+  getPath(piece,board){
+    let pieceID = piece.pieceID;
     let path = [];
     if(this.firstMove){
-      if(player === 1){
-        path.push(piece + 8);
-        path.push(piece + 16);
+      if(piece.player === 1){
+        if(!board[pieceID - 1].piece) path.push(pieceID + 8);
+        path.push(pieceID + 16);
       }
       else{
-        path.push(piece - 8);
-        path.push(piece - 16);
+        path.push(pieceID - 8);
+        path.push(pieceID - 16);
       }
     }
     else{
-      if(player === 1){
-        path.push(piece + 8);
+      if(piece.player === 1){
+        path.push(pieceID + 8);
       }
       else{
-        path.push(piece - 8);
+        path.push(pieceID - 8);
       }
     }
     return path;
