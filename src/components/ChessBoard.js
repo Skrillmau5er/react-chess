@@ -14,12 +14,13 @@ class ChessBoard extends React.Component {
       turn: 1,
       lostPieces: [],
       currentPath: [],
+      check: null,
     }
   };
 
   handlePieceClick = (piece) => {
     //Set active piece
-    if(!(this.state.activePiece) && (piece.piece) && (piece.player === this.state.turn)){
+    if(!(this.state.activePiece) && (piece.piece) && (piece.piece.player === this.state.turn)){
       this.setState({ currentPath : piece.piece.getPath(piece, this.state.board) })
       this.setActivePiece(piece,'set');
     }
@@ -62,7 +63,6 @@ class ChessBoard extends React.Component {
           this.addToFallen(x.piece);
         }
         x.piece = this.state.activePiece.piece;
-        x.player = this.state.activePiece.player;
         return x;
       }
       return x;
@@ -71,13 +71,27 @@ class ChessBoard extends React.Component {
     this.state.board.map(x => {
       if(x.pieceID === this.state.activePiece.pieceID){
         x.piece = null;
-        x.player = null;
         return x;
       }
       return x;
     });
     this.setActivePiece('unset');
     this.updateGame();
+    this.state.board.forEach(x => {
+        if(x.piece && x.player === piece.player){
+          this.isKingChecked(x);
+        }
+    });
+  }
+
+  isKingChecked = (piece) => {
+    piece.piece.getPath(piece, this.state.board).forEach(x => {
+      if (this.state.board[x-1].piece) {
+        if (this.state.board[x-1].piece.getName() === 'king') {
+          console.log('king is checked');
+        }
+      }
+    });
   }
 
   addToFallen = (piece) => {
@@ -96,7 +110,7 @@ class ChessBoard extends React.Component {
       let boardPiece = null;
 
       if(piece.piece){
-        boardPiece = <BoardPiece piece={piece.piece.getName()} player={piece.player}/>;
+        boardPiece = <BoardPiece piece={piece.piece.getName()} player={piece.piece.player}/>;
       }
       return (
           <BoardSquare 

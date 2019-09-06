@@ -8,26 +8,50 @@ export default class pawn extends piece {
   isFirstMove(){
     return this.firstMove;
   }
+
+  // Make sure pawn can't attack when in far right or left column.
   
   getPath(piece,board){
     let pieceID = piece.pieceID;
     let path = [];
+    let currCol = pieceID % 8;
     if(this.firstMove){
-      if(piece.player === 1){
-        if(!board[pieceID - 1].piece) path.push(pieceID + 8);
-        path.push(pieceID + 16);
+      if(piece.piece.player === 1){
+        //Check attack
+        if(board[pieceID + 6].piece !== null && board[pieceID + 6].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 7);
+        if(board[pieceID + 8].piece !== null && board[pieceID + 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 9);
+
+        if(board[pieceID + 7].piece == null){
+          path.push(pieceID + 8);
+          if(board[pieceID + 15].piece == null) path.push(pieceID + 16);
+        }
+        
       }
       else{
-        path.push(pieceID - 8);
-        path.push(pieceID - 16);
+        //Check attack
+        if(board[pieceID - 8].piece !== null && board[pieceID - 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 7);
+        if(board[pieceID - 10].piece !== null && board[pieceID - 10].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 9);
+        
+        if(board[pieceID - 9].piece == null) {
+          path.push(pieceID - 8);
+          if(board[pieceID -17].piece == null) path.push(pieceID - 16);
+        }
       }
     }
     else{
-      if(piece.player === 1){
-        path.push(pieceID + 8);
+      if(piece.piece.player === 1){
+        //Check attack
+        if(board[pieceID + 6].piece !== null && board[pieceID + 6].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 7);
+        if(board[pieceID + 8].piece !== null && board[pieceID + 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 9);
+
+        if(board[pieceID + 7].piece == null) path.push(pieceID + 8);
       }
       else{
-        path.push(pieceID - 8);
+        //Check attack
+        if(board[pieceID - 8].piece !== null && board[pieceID - 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 7);
+        if(board[pieceID - 10].piece !== null && board[pieceID - 10].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 9);
+
+        if(board[pieceID - 9].piece == null) path.push(pieceID - 8);
       }
     }
     return path;
@@ -37,3 +61,4 @@ export default class pawn extends piece {
     this.firstMove = false;
   }
 }
+
