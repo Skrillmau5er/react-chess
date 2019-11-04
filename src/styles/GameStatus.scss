@@ -14,23 +14,28 @@
   display: block;
   margin: 0 auto;
   border: black 1px solid;
+  border-radius: 4px;
 }
 
-.turn-container{
-  width: 200px;
+.turn-area{
   margin: 0 auto;
-  border: black 1px solid;
   border-top: none;
   padding-bottom: 20px;
 }
 
-#turnHeader{
-  border: black 1px solid;
-  border-bottom: none;
-  width: 200px;
-  text-align: center;
+.turn-container {
+  box-shadow: 1px 4px 20px 5px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  width: 150px;
   margin: 0 auto;
   margin-top: 30px;
+}
+
+#turnHeader{
+  border-bottom: none;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 10px;
   padding-bottom: 20px;
 }
 .white-turn{

@@ -1,39 +1,52 @@
 import piece from './piece'
 
 export default class knight extends piece {
-  getPath(piece, board){
+  getPath(ID, board){
     let path = [];
-    let pieceID = piece.pieceID;
-    let currCol = pieceID % 8;
-    if((pieceID - 17 > 0 && pieceID - 17 <= 64) && (currCol >= 2 || currCol === 0 )) {
-       if(this.canMove(pieceID - 17, board, piece.piece.player)) path.push(pieceID - 17);
+    let currCol = ID % 8;
+    if(this.isLegal(ID - 17, currCol, 1)) {
+       if(this.canMove(ID - 17, board, board[ID].getPlayer())) path.push(ID - 17);
     }
-    if((pieceID - 10 > 0 && pieceID - 10 <= 64) && (currCol >= 3 || currCol === 0 )) {
-       if(this.canMove(pieceID - 10, board, piece.piece.player)) path.push(pieceID - 10);
+    if(this.isLegal(ID - 10, currCol, 2)) {
+       if(this.canMove(ID - 10, board, board[ID].getPlayer())) path.push(ID - 10);
     } 
-    if((pieceID + 6 > 0 && pieceID + 6 <= 64) && (currCol >= 3 || currCol === 0 )) {
-       if(this.canMove(pieceID + 6, board, piece.piece.player)) path.push(pieceID + 6);
+    if(this.isLegal(ID + 6, currCol, 2)) {
+       if(this.canMove(ID + 6, board, board[ID].getPlayer())) path.push(ID + 6);
     } 
-    if((pieceID + 15 > 0 && pieceID + 15 <= 64) && (currCol >= 2 || currCol === 0 )) {
-       if(this.canMove(pieceID + 15, board, piece.piece.player)) path.push(pieceID + 15);
+    if(this.isLegal(ID + 15, currCol, 1)) {
+       if(this.canMove(ID + 15, board, board[ID].getPlayer())) path.push(ID + 15);
     }
-    if((pieceID - 15 > 0 && pieceID - 15 <= 64) && (currCol <= 7 && currCol !== 0)) {
-       if(this.canMove(pieceID - 15, board, piece.piece.player)) path.push(pieceID - 15);
+    if(this.isLegal(ID - 15, currCol, 6)) {
+       if(this.canMove(ID - 15, board, board[ID].getPlayer())) path.push(ID - 15);
     } 
-    if((pieceID - 6 > 0 && pieceID - 6 <= 64) && (currCol <= 6 && currCol !== 0)) {
-       if(this.canMove(pieceID - 6, board, piece.piece.player)) path.push(pieceID - 6);
+    if(this.isLegal(ID - 6, currCol, 5)) {
+       if(this.canMove(ID - 6, board, board[ID].getPlayer())) path.push(ID - 6);
     } 
-    if((pieceID + 10 > 0 && pieceID + 10 <= 64) && (currCol <= 6 && currCol !== 0)) {
-       if(this.canMove(pieceID + 10, board, piece.piece.player)) path.push(pieceID + 10);
+    if(this.isLegal(ID + 10, currCol, 5)) {
+       if(this.canMove(ID + 10, board, board[ID].getPlayer())) path.push(ID + 10);
     }
-    if((pieceID + 17 > 0 && pieceID + 17 <= 64) && (currCol <= 7 && currCol !== 0)) {
-       if(this.canMove(pieceID + 17, board, piece.piece.player)) path.push(pieceID + 17);
+    if(this.isLegal(ID + 17, currCol, 6)) {
+       if(this.canMove(ID + 17, board, board[ID].getPlayer())) path.push(ID + 17);
     }
     return path;
   }
 
-  canMove(pieceID, board, player){
-    if(board[pieceID - 1].piece === null || board[pieceID - 1].piece.player !== player){
+  isLegal(moveID, currCol, colBorder) {
+    if (colBorder > 4) {
+      if((moveID > 0 && moveID + 15 <= 64) && currCol <= colBorder) {
+        return true;
+      }
+    }
+    else{
+      if((moveID > 0 && moveID + 15 <= 64) && currCol >= colBorder) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  canMove(ID, board, player){
+    if(board[ID] === null || board[ID].getPlayer() !== player){
       return true;
     }
   }

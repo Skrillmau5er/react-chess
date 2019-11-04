@@ -1,38 +1,38 @@
 import piece from './piece'
 
 export default class king extends piece {
-  getPath(piece, board){
-    let pieceID = piece.pieceID;
+  getPath(ID, board){ 
     const path = [];
-    if((pieceID - 9) > 0 && (pieceID - 9) <= 64){ 
-      if(this.canMoveHere(pieceID - 9, board, piece.piece.player)) path.push(pieceID - 9);
+    let piece = board[ID];
+    if((ID - 9) >= 0 && (ID - 9) <= 63){ 
+      if(this.canMoveHere(ID - 9, board, piece.getPlayer())) path.push(ID - 9);
     }
-    if((pieceID - 8) > 0 && (pieceID - 8) <= 64){ 
-      if(this.canMoveHere(pieceID - 8, board, piece.piece.player)) path.push(pieceID - 8);
+    if((ID - 8) >= 0 && (ID - 8) <= 63){ 
+      if(this.canMoveHere(ID - 8, board, piece.getPlayer())) path.push(ID - 8);
     }
-    if((pieceID - 7) > 0 && (pieceID - 7) <= 64){ 
-      if(this.canMoveHere(pieceID - 7, board, piece.piece.player)) path.push(pieceID - 7);
+    if((ID - 7) >= 0 && (ID - 7) <= 63){ 
+      if(this.canMoveHere(ID - 7, board, piece.getPlayer())) path.push(ID - 7);
     }
-    if((pieceID + 1) > 0 && (pieceID + 1) <= 64){ 
-      if(this.canMoveHere(pieceID + 1, board, piece.piece.player)) path.push(pieceID + 1);
+    if((ID + 1) >= 0 && (ID + 1) <= 63){ 
+      if(this.canMoveHere(ID + 1, board, piece.getPlayer())) path.push(ID + 1);
     }
-    if((pieceID + 9) > 0 && (pieceID + 9) <= 64){ 
-      if(this.canMoveHere(pieceID + 9, board, piece.piece.player)) path.push(pieceID + 9);
+    if((ID + 9) >= 0 && (ID + 9) <= 63){ 
+      if(this.canMoveHere(ID + 9, board, piece.getPlayer())) path.push(ID + 9);
     }
-    if((pieceID + 8) > 0 && (pieceID + 9) <= 64){ 
-      if(this.canMoveHere(pieceID + 8, board, piece.piece.player)) path.push(pieceID + 8);
+    if((ID + 8) >= 0 && (ID + 9) <= 63){ 
+      if(this.canMoveHere(ID + 8, board, piece.getPlayer())) path.push(ID + 8);
     }
-    if((pieceID + 7) > 0 && (pieceID + 7) <= 64){ 
-      if(this.canMoveHere(pieceID + 7, board, piece.piece.player)) path.push(pieceID + 7);
+    if((ID + 7) >= 0 && (ID + 7) <= 63){ 
+      if(this.canMoveHere(ID + 7, board, piece.getPlayer())) path.push(ID + 7);
     }
-    if((pieceID - 1) > 0 && (pieceID - 1) <= 64){ 
-      if(this.canMoveHere(pieceID - 1, board, piece.piece.player)) path.push(pieceID - 1);
+    if((ID - 1) >= 0 && (ID - 1) <= 63){ 
+      if(this.canMoveHere(ID - 1, board, piece.getPlayer())) path.push(ID - 1);
     }
     return path;
   }
 
-  canMoveHere(pieceID, board, player){
-    if(board[pieceID - 1].piece === null || board[pieceID - 1].piece.player !== player){
+  canMoveHere(ID, board, player){
+    if(board[ID] === null || board[ID].getPlayer() !== player){
       return true;
     }
   }

@@ -1,64 +1,52 @@
-import piece from './piece'
+import piece from "./piece";
 
 export default class pawn extends piece {
-  constructor(name,player){
-    super(name,player)
-    this.firstMove = true;
-  }
-  isFirstMove(){
-    return this.firstMove;
-  }
+	constructor(name, player) {
+		super(name, player);
+		this.firstMove = true;
+	}
+	isFirstMove() {
+		return this.firstMove;
+	}
 
-  // Make sure pawn can't attack when in far right or left column.
-  
-  getPath(piece,board){
-    let pieceID = piece.pieceID;
-    let path = [];
-    let currCol = pieceID % 8;
-    if(this.firstMove){
-      if(piece.piece.player === 1){
-        //Check attack
-        if(board[pieceID + 6].piece !== null && board[pieceID + 6].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 7);
-        if(board[pieceID + 8].piece !== null && board[pieceID + 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 9);
+	getPath(ID, board) {
+		let path = [];
+		if (board[ID].getPlayer() === 1) {
+			if (this.canAttack(board, ID + 7, ID, 'L')) path.push(ID + 7);
+			if (this.canAttack(board, ID + 9, ID, 'R')) path.push(ID + 9);
 
-        if(board[pieceID + 7].piece == null){
-          path.push(pieceID + 8);
-          if(board[pieceID + 15].piece == null) path.push(pieceID + 16);
-        }
-        
-      }
-      else{
-        //Check attack
-        if(board[pieceID - 8].piece !== null && board[pieceID - 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 7);
-        if(board[pieceID - 10].piece !== null && board[pieceID - 10].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 9);
-        
-        if(board[pieceID - 9].piece == null) {
-          path.push(pieceID - 8);
-          if(board[pieceID -17].piece == null) path.push(pieceID - 16);
-        }
-      }
+			if (board[ID + 8] === null) {
+				path.push(ID + 8);
+				if (board[ID + 16] === null && this.firstMove) path.push(ID + 16);
+			}
+		} else {
+			if (this.canAttack(board, ID - 7, ID, 'R')) path.push(ID - 7);
+			if (this.canAttack(board, ID - 9, ID, 'L')) path.push(ID - 9);
+
+			if (board[ID - 8] === null) {
+				path.push(ID - 8);
+				if (board[ID - 16] === null && this.firstMove) path.push(ID - 16);
+			}
+		}
+		return path;
+	}
+
+	firstMoveOver() {
+		this.firstMove = false;
+	}
+
+	canAttack(board, attackID, ID, direction) {
+    let columnAttack;
+    if(direction === 'L'){
+      columnAttack = ID % 8 ? true : false;
     }
-    else{
-      if(piece.piece.player === 1){
-        //Check attack
-        if(board[pieceID + 6].piece !== null && board[pieceID + 6].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 7);
-        if(board[pieceID + 8].piece !== null && board[pieceID + 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID + 9);
-
-        if(board[pieceID + 7].piece == null) path.push(pieceID + 8);
-      }
-      else{
-        //Check attack
-        if(board[pieceID - 8].piece !== null && board[pieceID - 8].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 7);
-        if(board[pieceID - 10].piece !== null && board[pieceID - 10].piece.player !== piece.piece.player && currCol > 1) path.push(pieceID - 9);
-
-        if(board[pieceID - 9].piece == null) path.push(pieceID - 8);
-      }
+    else {
+      columnAttack = ID % 8 === 7 ? false : true;
     }
-    return path;
-  }
-
-  firstMoveOver(){
-    this.firstMove = false;
-  }
+		return (
+			board[attackID] !== null &&
+      board[attackID].getPlayer() !== board[ID].getPlayer() &&
+      columnAttack
+		);
+	}
 }
-
