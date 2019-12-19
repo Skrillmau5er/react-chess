@@ -1,5 +1,8 @@
 import React from "react";
 import { Route, Switch, withRouter } from "react-router-dom";
+
+import newGame from '../../services';
+
 import "../../styles/ChessBoard.scss";
 import BoardSquare from "./BoardSquare";
 import GameStatus from "./GameStatus";
@@ -32,14 +35,19 @@ class Game extends React.Component {
 	};
 
 	componentWillMount() {
-		this.setUpBoard();
+    this.setUpBoard();
   }
+
   componentDidMount() {
     this.interval = setInterval(() => this.tick(),1000)
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+  }
+
+  setUpNewGame = () => {
+    newGame(this.state);
   }
 
 	setUpBoard = () => {
@@ -67,7 +75,9 @@ class Game extends React.Component {
 		tempBoard[63] = new rook("rook", 2);
 		this.setState({
 			board: tempBoard,
-		});
+		}, () => {
+      this.setUpNewGame();
+    });
 	};
 
   tick = async () => {
@@ -217,6 +227,8 @@ class Game extends React.Component {
       gameStart,
     } = this;
 		return (
+      <>
+      <div className="game-container" />
         <Switch>
           <Route
             exact
@@ -259,7 +271,7 @@ class Game extends React.Component {
             render={() => <Results lostPieces={lostPieces} winner={winner} totalMoves={totalMoves} startNewGame={gameStart}/>} 
           />
         </Switch>
-      
+      </>
 		);
 	}
 }

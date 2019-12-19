@@ -22,3 +22,12 @@
 .path.grey{
   background: red;
 }
+
+@media only screen and (max-width: 460px) {
+  .board-square{
+    max-width: 35px;
+    width: 12.5%;
+    height: 35px;
+    max-height: 35px;
+  }
+}

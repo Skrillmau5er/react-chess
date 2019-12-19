@@ -25,6 +25,9 @@ const Results = ({ lostPieces, winner, totalMoves, startNewGame }) => {
       <Button variant="container" color="primary" onClick={() => startNewGame()}>
         <Link to="/game/">Start New Game</Link>
       </Button>
+      <Button variant="container" color="primary" onClick={() => startNewGame()}>
+        <Link to="/">Back to Main Menu</Link>
+      </Button>
     </div>
   )
 };
