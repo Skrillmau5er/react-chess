@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch, withRouter } from "react-router-dom";
+import MakeItRain from 'react-make-it-rain';
 
 import newGame from '../../services';
 
