@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/BoardPiece.scss';
+import '../../styles/Game/BoardPiece.scss';
 
 //Images for board piece
 import bishopB from '../../assets/bishop-black.png';

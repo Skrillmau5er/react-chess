@@ -1,0 +1,17 @@
+.center {
+  text-align: center;
+  color: white;
+  font-size: 40px;
+}
+
+.menu {
+  text-align: center;
+}
+
+.button-action-container {
+  display: flex;
+  justify-content: center;
+  & .action-button {
+    margin: 10px;
+  }
+}

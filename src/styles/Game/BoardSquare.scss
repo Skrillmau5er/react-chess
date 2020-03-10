@@ -5,10 +5,12 @@
   max-height: 50px;
   display: inline-block;
   vertical-align: bottom;
+  padding: 0;
+  border-radius: 0;
 }
 
 .grey{
-  background: #ccc;
+  background-color: #ccc;
 }
 
 .active {

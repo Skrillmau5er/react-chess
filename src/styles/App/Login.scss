@@ -1,0 +1,59 @@
+.forget-password-container {
+  text-align: center;
+  white-space: pre-wrap;
+  background-color: white;
+  position: absolute;
+  max-width: 300px;
+  width: 95%;
+  border-radius: 8px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  box-shadow: #505050 3px 4px 20px 2px;
+
+  .submit-forgot-login {
+    margin: 16px 0;
+  }
+}
+
+.login-grid-container {
+  height: 100vh;
+
+  .login-image-grid {
+    background-image: url(https://hdwallsource.com/img/2014/2/cool-chess-wallpaper-23569-24222-hd-wallpapers.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .login-item-container {
+    margin: 50px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .locked-out-icon {
+      margin: 10px;
+  }
+
+  .submit-login-form {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .login-error {
+    padding-left: 10px; 
+    color: #f44335;
+  }
+
+  .submit-login {
+      margin: 16px 0;
+  }
+
+  .google-icon {
+    width: 22px;
+    margin-right: 10px;
+  }
+}

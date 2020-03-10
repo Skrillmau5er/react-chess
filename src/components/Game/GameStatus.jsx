@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/GameStatus.scss';
+import '../../styles/Game/GameStatus.scss';
 import BoardPiece from './BoardPiece';
 
 

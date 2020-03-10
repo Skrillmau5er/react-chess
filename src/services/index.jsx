@@ -1,7 +1,8 @@
 import axios from 'axios';
+let root = 'http://localhost:9000';
 
-const newGame = gameData => {
-  return axios.post('/creategame', gameData);
+const getGame = async () => {
+  return await axios.get(`${root}/game`);
 };
 
-export default newGame;
+export default getGame;
