@@ -13,6 +13,8 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { auth } from '../../services/firebase';
 import '../../styles/App/CreateUser.scss';
+import { createUser } from '../../services';
+import { toast } from 'react-toastify';
 
 export default class CreateUserNew extends Component {
   state = {
@@ -89,7 +91,7 @@ export default class CreateUserNew extends Component {
   };
 
   onSumbit = async event => {
-    const { email, password } = this.state;
+    const { email, password, firstName, lastName } = this.state;
     event.preventDefault();
     this.setState({ submitted: true });
 
@@ -100,12 +102,15 @@ export default class CreateUserNew extends Component {
         .then(async cred => {
           let token = await cred.user.getIdToken(true);
           let uid = cred.user.uid;
+          await createUser({ firstName, lastName, email, token, uid });
+          this.props.history.push('/');
         })
         .catch(err => {
           let errorCode = err.code;
           let errorMessage = err.message;
           console.error(errorCode);
           console.error(errorMessage);
+          toast.error(errorMessage);
         })
         .finally(() => {
           this.setState({ isLoading: false });
@@ -220,9 +225,9 @@ export default class CreateUserNew extends Component {
               </Button>
               <Grid container justify='flex-end'>
                 <Grid item>
-                  <Link href='login' variant='body2'>
-                    Already have an account? Sign in
-                  </Link>
+                    <Link href='/' variant='body2'>
+                      Already have an account? Sign in
+                    </Link>
                 </Grid>
               </Grid>
             </form>

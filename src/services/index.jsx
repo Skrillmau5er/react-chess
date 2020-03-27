@@ -1,8 +1,30 @@
 import axios from 'axios';
 let root = 'http://localhost:9000';
 
-const getGame = async () => {
-  return await axios.get(`${root}/game`);
+export const getGame = async id => {
+  return await axios.get(`${root}/game/${id}`);
 };
 
-export default getGame;
+export const getAllUsers = async () => {
+  return await axios.get(`${root}/users`);
+};
+
+export const createUser = async data => {
+  return await axios.post(`${root}/users`, data);
+};
+
+export const createGame = async data => {
+  return await axios.post(`${root}/game`, data);
+};
+
+export const getGamesByUser = async user => {
+  return await axios.get(`${root}/game/getByUser/${user}`);
+};
+
+export const deleteGame = async gameID => {
+  return await axios.put(`${root}/game/delete/${gameID}`);
+};
+
+export const updateGame = async (data) => {
+  return await axios.put(`${root}/game/update`, data);
+};

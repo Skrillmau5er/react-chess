@@ -1,28 +1,41 @@
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import React from 'react';
-import Game from '../Game';
+import GameRoutes from '../Game';
 import Home from './Home';
 import Tutorial from './Tutorial';
 import Login from './Login';
 import CreateUser from './CreateUser';
 import { auth } from '../../services/firebase';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AppBar, Toolbar, IconButton, Typography, MenuItem, Menu } from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import '../../styles/App/index.scss';
+import { createGame } from '../../services';
+import ErrorPage from './ErrorPage';
+import PrivateRoute from './PrivateRoute';
 
 export default class App extends React.Component {
   state = {
     user: null,
     anchorEl: null,
     open: false,
-    isLoaded: false
+    isLoaded: false,
+    currentGame: null
   };
 
   handleMenu = event => {
     this.setState({ anchorEl: event.currentTarget, open: true });
+  };
+
+  createNewGame = () => {
+    createGame({
+      player: this.state.user.uid
+    })
+      .then(res => {
+        this.setState({ currentGame: res });
+      })
+      .catch(err => {
+        toast.error(err);
+      });
   };
 
   handleClose = () => {
@@ -33,10 +46,9 @@ export default class App extends React.Component {
   };
 
   signOut = () => {
-    auth.signOut()
-    .then(() => {
-      window.location.href = '/'
-    })
+    auth.signOut().then(() => {
+      window.location.href = '/';
+    });
   };
 
   componentDidMount() {
@@ -44,66 +56,45 @@ export default class App extends React.Component {
       if (user) {
         this.setState({ user });
       }
+      this.setState({ isLoaded: true });
     });
-    this.setState({ isLoaded: true });
   }
 
   render() {
-    const { user, open, anchorEl, isLoaded } = this.state;
+    const { user, isLoaded } = this.state;
     return (
       <div className='App'>
-        <AppBar position='static'>
-          <Toolbar variant='dense'>
-            <IconButton edge='start' color='inherit' aria-label='menu'>
-              <MenuIcon />
-            </IconButton>
-            <Typography variant='h6' color='inherit'>
-              Quick Chess
-            </Typography>
-            <div>
-              <IconButton
-                aria-label='account of current user'
-                aria-controls='menu-appbar'
-                aria-haspopup='true'
-                onClick={this.handleMenu}
-                color='inherit'
-              >
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                id='menu-appbar'
-                anchorEl={anchorEl}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right'
-                }}
-                open={open}
-                onClose={this.handleClose}
-              >
-                <MenuItem onClick={this.handleClose}>My account</MenuItem>
-                <MenuItem onClick={this.signOut}>Sign Out</MenuItem>
-              </Menu>
-            </div>
-          </Toolbar>
-        </AppBar>
-        <ToastContainer />
         {isLoaded && (
           <Router>
-            <Switch>
-              <Route
-                exact
-                path='/'
-                render={props => (user ? <Home {...props} /> : <Login {...props} />)}
-              />
-              <Route exact path='/createUser' render={props => <CreateUser {...props} />} />
-              <Route path='/game/' render={props => <Game {...props} />} />
-              <Route path='/tutorial/' render={props => <Tutorial {...props} />} />
-            </Switch>
+            <ToastContainer />
+              <Switch>
+                <Route
+                  exact
+                  path='/'
+                  render={props =>
+                    user ? (
+                      <Home
+                        {...props}
+                        user={user}
+                        createNewGame={this.createNewGame}
+                        signOut={this.signOut}
+                      />
+                    ) : (
+                      <Login {...props} />
+                    )
+                  }
+                />
+                <Route exact path='/createUser' render={props => <CreateUser {...props} />} />
+                <PrivateRoute
+                  path='/game'
+                  user={user}
+                  render={props => <GameRoutes {...props} />}
+                />
+                <PrivateRoute path='/tutorial' render={props => <Tutorial {...props} />} />
+                <Route path='*'>
+                  <ErrorPage />
+                </Route>
+              </Switch>
           </Router>
         )}
       </div>

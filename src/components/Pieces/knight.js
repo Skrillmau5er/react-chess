@@ -46,6 +46,7 @@ export default class knight extends piece {
   }
 
   canMove(ID, board, player){
+    console.log(board[ID].getPlayer(), player);
     if(board[ID] === null || board[ID].getPlayer() !== player){
       return true;
     }

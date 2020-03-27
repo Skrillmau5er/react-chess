@@ -2,9 +2,8 @@ import React from 'react';
 import '../../styles/Game/Results.scss';
 import BoardPiece from './BoardPiece';
 import Button from '@material-ui/core/Button';
-import { Link } from 'react-router-dom';
 
-const Results = (props, { lostPieces, winner, totalMoves, startNewGame }) => {
+const Results = ({ lostPieces, winner, totalMoves, history }) => {
   let theFallen;
   if (lostPieces) {
     theFallen = lostPieces.map(x => {
@@ -25,15 +24,7 @@ const Results = (props, { lostPieces, winner, totalMoves, startNewGame }) => {
         style={{ margin: '10px' }}
         variant='contained'
         color='primary'
-        onClick={() => props.history.push('/game')}
-      >
-        Start New Game
-      </Button>
-      <Button
-        style={{ margin: '10px' }}
-        variant='contained'
-        color='primary'
-        onClick={() => props.history.push('/')}
+        onClick={() => history.push('/')}
       >
         Back to Main Menu
       </Button>

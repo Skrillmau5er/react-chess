@@ -1,0 +1,20 @@
+.error-page {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    padding-top: 150px;
+
+    .error-text {
+        width: 80%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .error-gif {
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+}
