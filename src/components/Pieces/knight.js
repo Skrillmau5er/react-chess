@@ -33,21 +33,25 @@ export default class knight extends piece {
 
   isLegal(moveID, currCol, colBorder) {
     if (colBorder > 4) {
-      if((moveID > 0 && moveID + 15 <= 64) && currCol <= colBorder) {
+      if((moveID >= 0 && moveID <= 64) && currCol <= colBorder) {
+      console.log('yessss', moveID);
         return true;
       }
     }
     else{
-      if((moveID > 0 && moveID + 15 <= 64) && currCol >= colBorder) {
+      if((moveID >= 0 && moveID <= 64) && currCol >= colBorder) {
+        console.log('yessss', moveID);
         return true;
       }
     }
+    console.log('nnooooooo', moveID);
     return false;
   }
 
   canMove(ID, board, player){
-    console.log(board[ID].getPlayer(), player);
+    
     if(board[ID] === null || board[ID].getPlayer() !== player){
+      console.log('YESSS', ID);
       return true;
     }
   }

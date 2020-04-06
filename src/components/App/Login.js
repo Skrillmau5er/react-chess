@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-  Avatar,
   Button,
   CssBaseline,
   TextField,
@@ -16,6 +15,7 @@ import '../../styles/App/Login.scss';
 import { toast } from 'react-toastify';
 import { auth, provider } from '../../services/firebase';
 import googleIcon from '../../assets/google-icon.png';
+import chessIcon from '../../assets/pawn-black.png';
 
 export default class LoginNew extends Component {
   state = {
@@ -169,9 +169,7 @@ export default class LoginNew extends Component {
           <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
             <div className='login-item-container'>
               {/* <img src={this.props.isInternal ? ybaLogo : cspLogoOnly} className="yba-logo"/> */}
-              <Avatar className='locked-out-icon'>
-                <LockOutlinedIcon />
-              </Avatar>
+              <img src={chessIcon} className='chess-icon'/>
               <Typography component='h1' variant='h5'>
                 Sign into Quick Chess
               </Typography>

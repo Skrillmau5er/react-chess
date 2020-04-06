@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import CurrentGames from './CurrentGames';
 
 const Home = ({ history, user, createNewGame, signOut }) => {
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState(null);
 
   useEffect(() => {
     getGames();

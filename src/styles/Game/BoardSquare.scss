@@ -1,7 +1,9 @@
-.board-square{
+@import '../index.scss';
+
+.board-square {
   max-width: 50px;
   width: 12.5%;
-  height: 50px;
+  height: 50px !important;
   max-height: 50px;
   display: inline-block;
   vertical-align: bottom;
@@ -9,24 +11,24 @@
   border-radius: 0;
 }
 
-.grey{
+.grey {
   background-color: #ccc;
 }
 
 .active {
-  background: #8aceff;
+  background: #448aff;
 }
 
-.path{
-  background: rgb(255, 42, 42);
+.path {
+  background: $HighlightColor;
 }
 
-.path.grey{
-  background: red;
+.path.grey {
+  background: $HighlightColor;
 }
 
 @media only screen and (max-width: 460px) {
-  .board-square{
+  .board-square {
     max-width: 35px;
     width: 12.5%;
     height: 35px;

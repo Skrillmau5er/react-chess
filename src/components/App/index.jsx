@@ -85,10 +85,10 @@ export default class App extends React.Component {
                   }
                 />
                 <Route exact path='/createUser' render={props => <CreateUser {...props} />} />
-                <PrivateRoute
+                <Route
                   path='/game'
                   user={user}
-                  render={props => <GameRoutes {...props} />}
+                  render={props => <GameRoutes {...props} user={user} />}
                 />
                 <PrivateRoute path='/tutorial' render={props => <Tutorial {...props} />} />
                 <Route path='*'>

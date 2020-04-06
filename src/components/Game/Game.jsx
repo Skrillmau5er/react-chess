@@ -8,10 +8,11 @@ import bishop from '../Pieces/bishop';
 import knight from '../Pieces/knight';
 import pawn from '../Pieces/pawn';
 import king from '../Pieces/king';
-import { getGame, updateGame as gameUpdate } from '../../services';
+import { getGame, updateGame as gameUpdate, setGameOver } from '../../services';
 import { toast } from 'react-toastify';
+import { createAnimation } from '../Utils/SkeletonBoardAnimation';
 
-const Game = ({ match, history }) => {
+const Game = ({ match, history, game }) => {
   const [board, setBoard] = useState(null);
   const [activePiece, setActivePiece] = useState(null);
   const [totalMoves, setTotalMoves] = useState(0);
@@ -22,16 +23,19 @@ const Game = ({ match, history }) => {
     checked: false,
     player: null
   });
-  const [winner, setWinner] = useState(null);
 
   useEffect(() => {
     getGame(match.params.gameID)
-      .then(res => {
-        console.log(res.data);
-        setUpBoard(res.data.board);
+      .then(game => {
+        if (!game.data.deleted && game.data.inProgress) {
+          setUpGame(game.data);
+        } else {
+          // Becuase there is two history pushes, it is impossible to get back to home through the back button if the game is over.
+          history.push(`/game/${match.params.gameID}/results`);
+        }
       })
       .catch(err => {
-        console.error(err);
+        console.log(err);
         toast.error('Error getting game data.');
       });
   }, []);
@@ -44,10 +48,10 @@ const Game = ({ match, history }) => {
   //   clearInterval(this.interval);
   // }
 
-  const setUpBoard = board => {
+  const setUpGame = gameData => {
     const tempBoard = new Array(64).fill(null);
 
-    board.map((x, i) => {
+    gameData.board.map((x, i) => {
       if (x !== null) {
         if (x.name === 'rook') {
           tempBoard[i] = new rook('rook', x.player);
@@ -69,18 +73,10 @@ const Game = ({ match, history }) => {
         }
       }
     });
+    setTurn(gameData.turn);
+    setTotalMoves(gameData.totalMoves);
     setBoard(tempBoard);
   };
-
-  //   tick = async () => {
-  //     await this.setState({
-  //       timeLeft: this.state.timeLeft - 1
-  //     });
-  //     if (this.state.timeLeft === 0) {
-  //       this.switchTurns();
-  //       this.resetTimeLeft();
-  //     }
-  //   };
 
   const handlePieceClick = ID => {
     //Set active piece
@@ -98,8 +94,6 @@ const Game = ({ match, history }) => {
     else if (activePiece !== ID && activePiece !== null && currentPath.includes(ID)) {
       console.log('Move piece if possible');
       movePiece(ID);
-      setActive(false);
-      updateGame();
     }
     //Unset by clicking out of range
     else if (activePiece) {
@@ -126,12 +120,18 @@ const Game = ({ match, history }) => {
     if (board[moveToID]) addToFallen(moveToID);
     board[moveToID] = board[activePiece];
     board[activePiece] = null;
+    let gameID = match.params.gameID;
+    try {
+      await gameUpdate({ gameID, board, totalMoves, turn });
+      setBoard(board);
+      setActive(false);
+      updateGame();
+    } catch (err) {
+      toast.error('OH NOOO');
+    }
     // board.forEach((piece, i) => {
     //   if (piece) isKingChecked(piece, i);
     // });
-    setTotalMoves(totalMoves);
-    let gameID = match.params.gameID;
-    await gameUpdate({ gameID, board });
   };
 
   // const isKingChecked = (piece, ID) => {
@@ -157,12 +157,13 @@ const Game = ({ match, history }) => {
     ]);
   };
 
-  const gameOver = () => {
-    history.push('/game/results');
-    setWinner(turn);
+  const gameOver = async () => {
+    let gameID = match.params.gameID;
+    await setGameOver({ gameID, winner: turn });
+    history.push(`/game/${gameID}/results`);
   };
 
-  const updateGame = () => {
+  const updateGame = async () => {
     switchTurns();
     setKingCheckStatus({
       checked: false,
@@ -182,31 +183,9 @@ const Game = ({ match, history }) => {
     }
   };
 
-  //   resetTimeLeft = () => {
-  //     this.setState({ timeLeft: 10 });
-  //   };
-
-  // const gameStart = () => {
-  //   this.setState({
-  //     activePiece: null,
-  //     totalMoves: 0,
-  //     //   timeLeft: 10,
-  //     //   timer: null,
-  //     turn: 1,
-  //     lostPieces: [],
-  //     currentPath: [],
-  //     kingCheckStatus: {
-  //       checked: false,
-  //       pallyer: null
-  //     },
-  //     winner: null
-  //   });
-  //   this.setUpBoard();
-  // };
-
   return (
     <div className='game-container'>
-      {board && (
+      {board ? (
         <div className='chess-area'>
           <div className='chess-board'>
             {board.map((piece, id) => {
@@ -224,8 +203,10 @@ const Game = ({ match, history }) => {
               );
             })}
           </div>
-          <GameStatus turn={turn} /*timeLeft={timeLeft}*/ kingCheckStatus={kingCheckStatus} />
+          <GameStatus turn={turn} kingCheckStatus={kingCheckStatus} />
         </div>
+      ) : (
+        createAnimation()
       )}
     </div>
   );

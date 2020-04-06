@@ -14,7 +14,7 @@ export const createUser = async data => {
 };
 
 export const createGame = async data => {
-  return await axios.post(`${root}/game`, data);
+  return await axios.post(`${root}/game/create`, data);
 };
 
 export const getGamesByUser = async user => {
@@ -25,6 +25,14 @@ export const deleteGame = async gameID => {
   return await axios.put(`${root}/game/delete/${gameID}`);
 };
 
-export const updateGame = async (data) => {
+export const updateGame = async data => {
   return await axios.put(`${root}/game/update`, data);
+};
+
+export const setGameOver = async data => {
+  return await axios.put(`${root}/game/gameOver`, data);
+};
+
+export const sendGameInvite = async data => {
+  return await axios.post(`${root}/game/sendInvite`, data);
 };

@@ -1,8 +1,12 @@
 .current-games-container {
-    margin-top: 30px;
+    padding: 30px;
   .game-card {
     max-width: 300px;
     width: 100%;
   };
+
+  .game-skeleton {
+    margin: 8px;
+  }
 };
 

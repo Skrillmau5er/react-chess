@@ -37,16 +37,19 @@ export default class pawn extends piece {
 
   canAttack(board, attackID, ID, direction) {
     let columnAttack;
-    if (direction === 'L') {
-      columnAttack = ID % 8 ? true : false;
+    if (attackID >= 0 && attackID <= 63) {
+      if (direction === 'L') {
+        columnAttack = ID % 8 ? true : false;
+      } else {
+        columnAttack = ID % 8 === 7 ? false : true;
+      }
+      return (
+        board[attackID] !== null &&
+        board[attackID].getPlayer() !== board[ID].getPlayer() &&
+        columnAttack
+      );
     } else {
-      columnAttack = ID % 8 === 7 ? false : true;
-	}
-	console.log(board[attackID]);
-    return (
-      board[attackID] !== null &&
-      board[attackID].getPlayer() !== board[ID].getPlayer() &&
-      columnAttack
-    );
+      return false;
+    }
   }
 }
