@@ -1,5 +1,5 @@
 import axios from 'axios';
-let root = 'http://localhost:9000';
+let root = 'https://quick-chess-2020-273416.appspot.com/8080';
 
 export const getGame = async id => {
   return await axios.get(`${root}/game/${id}`);
