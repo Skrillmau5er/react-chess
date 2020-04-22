@@ -13,7 +13,7 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { auth } from '../../services/firebase';
 import '../../styles/App/CreateUser.scss';
-import { createUser } from '../../services';
+import { createUser, checkUserName } from '../../services';
 import { toast } from 'react-toastify';
 
 export default class CreateUserNew extends Component {
@@ -26,6 +26,8 @@ export default class CreateUserNew extends Component {
     lastNameErr: null,
     email: null,
     emailErr: null,
+    userName: null,
+    userNameErr: null,
     password: null,
     passwordErr: null,
     password2: null,
@@ -47,12 +49,13 @@ export default class CreateUserNew extends Component {
 
   validate = () => {
     let validationPassed = true;
-    const { firstName, lastName, email, password, password2 } = this.state;
+    const { firstName, lastName, email, userName, password, password2 } = this.state;
 
     this.setState({
       firstNameErr: null,
       lastNameErr: null,
       emailErr: null,
+      userNameErr: null,
       passwordErr: null,
       password2Err: null
     });
@@ -68,6 +71,10 @@ export default class CreateUserNew extends Component {
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       validationPassed = false;
       this.setState({ emailErr: 'Not a valid email' });
+    }
+    if (!userName) {
+      validationPassed = false;
+      this.setState({ userNameErr: 'Please enter a username' });
     }
     if (!password) {
       validationPassed = false;
@@ -91,31 +98,41 @@ export default class CreateUserNew extends Component {
   };
 
   onSumbit = async event => {
-    const { email, password, firstName, lastName } = this.state;
+    const { userName } = this.state;
     event.preventDefault();
     this.setState({ submitted: true });
 
     if (this.validate()) {
       this.setState({ isLoading: true });
-      await auth
+      await checkUserName(userName)
+      .then(() => {
+        this.createNewUser();
+      })
+      .catch(err => {
+        this.setState({ isLoading: false });
+        toast.error(err.response.data);
+      })
+    }
+  };
+
+  createNewUser = async () => {
+    const { email, password, firstName, lastName, userName } = this.state;
+    await auth
         .createUserWithEmailAndPassword(email, password)
         .then(async cred => {
           let token = await cred.user.getIdToken(true);
           let uid = cred.user.uid;
-          await createUser({ firstName, lastName, email, token, uid });
+          await createUser({ firstName, lastName, email, token, uid, userName });
           this.props.history.push('/');
         })
         .catch(err => {
-          let errorCode = err.code;
           let errorMessage = err.message;
-          console.error(errorCode);
           console.error(errorMessage);
           toast.error(errorMessage);
         })
         .finally(() => {
           this.setState({ isLoading: false });
         });
-    }
   };
 
   render() {
@@ -124,6 +141,7 @@ export default class CreateUserNew extends Component {
       firstNameErr,
       lastNameErr,
       emailErr,
+      userNameErr,
       password,
       passwordErr,
       password2,
@@ -181,6 +199,19 @@ export default class CreateUserNew extends Component {
                     onChange={e => this.change(e, 'email')}
                     helperText={emailErr}
                     error={emailErr ? true : false}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    variant='outlined'
+                    fullWidth
+                    id='userName'
+                    label='Username'
+                    name='userName'
+                    autoComplete='username'
+                    onChange={e => this.change(e, 'userName')}
+                    helperText={userNameErr}
+                    error={userNameErr ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12}>

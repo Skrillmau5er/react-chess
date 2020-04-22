@@ -4,8 +4,9 @@ import '../../styles/App/Menu.scss';
 import { getGamesByUser, deleteGame as deleteGameById } from '../../services';
 import { toast } from 'react-toastify';
 import CurrentGames from './CurrentGames';
+import CreateGameTile from './CreateGameTile';
 
-const Home = ({ history, user, createNewGame, signOut }) => {
+const Home = ({ history, user, signOut }) => {
   const [games, setGames] = useState(null);
 
   useEffect(() => {
@@ -14,40 +15,30 @@ const Home = ({ history, user, createNewGame, signOut }) => {
 
   const getGames = () => {
     getGamesByUser(user.uid)
-      .then(res => {
+      .then((res) => {
         setGames(res.data);
       })
-      .catch(err => {
+      .catch((err) => {
         toast.error(err);
       });
   };
 
-  const deleteGame = id => {
+  const deleteGame = (id) => {
     deleteGameById(id)
-      .then(res => {
+      .then((res) => {
         getGames();
         toast.success('Game Successfully deleted');
       })
-      .catch(err => {
+      .catch((err) => {
         toast.error('Error Deleting Game', err);
       });
   };
 
   return (
     <div className='menu'>
-      <Typography variant='h3'>Welcome</Typography>
       <div className='button-action-container'>
-        <Button
-          className='action-button'
-          variant='contained'
-          color='primary'
-          onClick={async () => {
-            await createNewGame();
-            history.push('/game');
-          }}
-        >
-          New Game
-        </Button>
+        <Typography component='h1' variant='h6'>{user.email}</Typography>
+        <CreateGameTile uid={user.uid} />
         <Button
           className='action-button'
           variant='contained'

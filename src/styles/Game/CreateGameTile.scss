@@ -1,0 +1,14 @@
+.setup-game-grid {
+  display: flex;
+  justify-content: center;
+  .setup-game-area {
+    padding: 20px;
+
+    .start-game-button {
+      margin-bottom: 8px;
+    }
+    .chess-icon {
+      width: 50px;
+    }
+  }
+}

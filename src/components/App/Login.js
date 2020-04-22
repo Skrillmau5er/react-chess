@@ -8,12 +8,12 @@ import {
   Paper,
   Grid,
   Typography,
-  Modal
+  Modal,
 } from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import '../../styles/App/Login.scss';
 import { toast } from 'react-toastify';
 import { auth, provider } from '../../services/firebase';
+import { createUser } from '../../services';
 import googleIcon from '../../assets/google-icon.png';
 import chessIcon from '../../assets/pawn-black.png';
 
@@ -29,7 +29,7 @@ export default class LoginNew extends Component {
     isLoadingForgot: false,
     submitted: false,
     displayError: false,
-    showForgotPassword: false
+    showForgotPassword: false,
   };
 
   validate = () => {
@@ -38,7 +38,7 @@ export default class LoginNew extends Component {
 
     this.setState({
       emailErr: null,
-      passwordErr: null
+      passwordErr: null,
     });
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       validationPassed = false;
@@ -68,7 +68,7 @@ export default class LoginNew extends Component {
     this.setState({ showForgotPassword: false });
   };
 
-  forgotPassword = e => {
+  forgotPassword = (e) => {
     const { emailForgot } = this.state;
     e.preventDefault();
     if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(emailForgot)) {
@@ -78,7 +78,7 @@ export default class LoginNew extends Component {
         .then(() => {
           toast.success('A email has been sent to you to reset your password.');
         })
-        .catch(err => {
+        .catch((err) => {
           toast.error(`There was an error. ${err}`);
         })
         .finally(() => {
@@ -89,7 +89,7 @@ export default class LoginNew extends Component {
     }
   };
 
-  login = e => {
+  login = (e) => {
     e.preventDefault();
     this.setState({ submitted: true });
     const { email, password } = this.state;
@@ -97,11 +97,11 @@ export default class LoginNew extends Component {
     if (this.validate()) {
       this.setState({
         isLoading: true,
-        displayError: false
+        displayError: false,
       });
-      auth.signInWithEmailAndPassword(email, password).catch(err => {
+      auth.signInWithEmailAndPassword(email, password).catch((err) => {
         this.setState({
-          isLoading: false
+          isLoading: false,
         });
         toast.error('Sign in falied');
         console.log(err);
@@ -109,10 +109,29 @@ export default class LoginNew extends Component {
     }
   };
 
-  signInWithGoogle = e => {
+  signInWithGoogle = (e) => {
     e.preventDefault();
     this.setState({ submitted: true });
-    auth.signInWithPopup(provider);
+    auth
+      .signInWithPopup(provider)
+      .then((res) => {
+        this.createNewUser(res);
+      })
+      .catch((err) => {
+        let errorMessage = err.message;
+        toast.error(errorMessage);
+      });
+  };
+
+  createNewUser = async res => {
+    let firstName = null;
+    let lastName = null;
+    let email = res.user.email;
+    let token = res.credential.accessToken
+    let userName = null;
+    let uid = res.user.uid;
+    await createUser({ firstName, lastName, email, token, uid, userName });
+    return
   };
 
   render() {
@@ -123,7 +142,7 @@ export default class LoginNew extends Component {
       emailErr,
       emailForgotErr,
       showForgotPassword,
-      passwordErr
+      passwordErr,
     } = this.state;
     return (
       <>
@@ -142,7 +161,7 @@ export default class LoginNew extends Component {
                   label='Email Address'
                   name='email'
                   autoComplete='email'
-                  onChange={e => this.setState({ emailForgot: e.target.value })}
+                  onChange={(e) => this.setState({ emailForgot: e.target.value })}
                   helperText={emailForgotErr}
                   fullWidth
                   error={emailForgotErr ? true : false}
@@ -155,7 +174,7 @@ export default class LoginNew extends Component {
                   color='primary'
                   fullWidth
                   disabled={isLoadingForgot}
-                  onClick={e => this.forgotPassword(e)}
+                  onClick={(e) => this.forgotPassword(e)}
                 >
                   Send Forgot Password Email
                 </Button>
@@ -169,7 +188,7 @@ export default class LoginNew extends Component {
           <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
             <div className='login-item-container'>
               {/* <img src={this.props.isInternal ? ybaLogo : cspLogoOnly} className="yba-logo"/> */}
-              <img src={chessIcon} className='chess-icon'/>
+              <img src={chessIcon} className='chess-icon' />
               <Typography component='h1' variant='h5'>
                 Sign into Quick Chess
               </Typography>
@@ -182,7 +201,7 @@ export default class LoginNew extends Component {
                   label='Email Address'
                   name='email'
                   autoComplete='email'
-                  onChange={e => this.change(e, 'email')}
+                  onChange={(e) => this.change(e, 'email')}
                   helperText={emailErr}
                   error={emailErr ? true : false}
                   autoFocus
@@ -195,7 +214,7 @@ export default class LoginNew extends Component {
                   label='Password'
                   type='password'
                   id='password'
-                  onChange={e => this.change(e, 'password')}
+                  onChange={(e) => this.change(e, 'password')}
                   autoComplete='current-password'
                   error={passwordErr ? true : false}
                   helperText={passwordErr}
@@ -212,7 +231,7 @@ export default class LoginNew extends Component {
                   variant='contained'
                   color='primary'
                   disabled={isLoading}
-                  onClick={e => this.login(e)}
+                  onClick={(e) => this.login(e)}
                 >
                   Sign In
                 </Button>
@@ -223,7 +242,7 @@ export default class LoginNew extends Component {
                   variant='outlined'
                   color='primary'
                   disabled={isLoading}
-                  onClick={e => this.signInWithGoogle(e)}
+                  onClick={(e) => this.signInWithGoogle(e)}
                 >
                   <img className='google-icon' src={googleIcon} alt='google-icon' />
                   Sign In With Google
