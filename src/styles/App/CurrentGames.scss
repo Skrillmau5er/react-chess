@@ -1,12 +1,23 @@
-.current-games-container {
-    padding: 30px;
-  .game-card {
-    max-width: 300px;
-    width: 100%;
-  };
+@import "../../styles/Utils/variables.scss";
 
-  .game-skeleton {
-    margin: 8px;
+.game-card {
+  background-color: $PrimaryColorLight !important;
+
+  .game-card-actions {
+    display: flex;
+    justify-content: space-between;
   }
-};
+
+  .game-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .game-card-turn-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+}
 

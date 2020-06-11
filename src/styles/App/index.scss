@@ -1,7 +1,37 @@
-@import '../index.scss';
+@import "../Utils/variables.scss";
+@import "../Utils/util-classes.scss";
+
+html,
+body,
+#root,
+.App {
+  height: 100%;
+}
+
 body {
-    margin: 0;
-    font-family: 'Baloo Paaji 2', cursive;
-    background-color: $PrimaryColorDark;
-    color: white;
+  margin: 0;
+  font-family: "Baloo Paaji 2", cursive;
+  background-color: $PrimaryColor;
+  color: white;
+}
+
+.body__content {
+  width: 100%;
+  overflow: auto;
+
+  &.hide-menu {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: ($screen-sm - 1)) {
+  .App {
+    flex-direction: column-reverse;
+    justify-content: space-between;
+  }
+}
+
+.App {
+  display: flex;
+  position: relative;
 }

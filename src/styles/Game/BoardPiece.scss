@@ -1,20 +1,24 @@
-.board-piece{
-  width: 80%;
-  height: 80%;
-  padding: 10%;
-}
-
-.board-piece-container{
+.board-piece-container {
   margin: 0 auto;
   text-align: center;
-}
 
-.board-piece.fallen{
-  width: 50px;
-  padding: 10px;
-  display: inline;
-}
+  &.fallen {
+    display: inline-block;
+  }
 
-.board-piece-container.fallen{
-  display: inline-block;
+  .board-piece {
+    width: 80%;
+    height: 80%;
+    padding: 10%;
+
+    &.fallen {
+      width: 50px;
+      padding: 10px;
+      display: inline;
+    }
+
+    &.flip {
+      transform: rotate(180deg);
+    }
+  }
 }

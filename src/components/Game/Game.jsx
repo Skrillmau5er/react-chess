@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import '../../styles/Game/ChessBoard.scss';
-import BoardSquare from './BoardSquare';
-import GameStatus from './GameStatus';
-import queen from '../Pieces/queen';
-import rook from '../Pieces/rook';
-import bishop from '../Pieces/bishop';
-import knight from '../Pieces/knight';
-import pawn from '../Pieces/pawn';
-import king from '../Pieces/king';
-import { getGame, updateGame as gameUpdate, setGameOver } from '../../services';
-import { toast } from 'react-toastify';
-import { createAnimation } from '../Utils/SkeletonBoardAnimation';
+import React, { useEffect, useState } from "react";
+import "../../styles/Game/ChessBoard.scss";
+import BoardSquare from "./BoardSquare";
+import GameStatus from "./GameStatus";
+import queen from "../Pieces/queen";
+import rook from "../Pieces/rook";
+import bishop from "../Pieces/bishop";
+import knight from "../Pieces/knight";
+import pawn from "../Pieces/pawn";
+import king from "../Pieces/king";
+import { getGame, updateGame as gameUpdate, setGameOver } from "../../services";
+import { toast } from "react-toastify";
+import { createAnimation } from "../Utils/SkeletonBoardAnimation";
+import { IconButton } from "@material-ui/core";
+import ClearIcon from "@material-ui/icons/Clear";
 
-const Game = ({ match, history, user }) => {
+const Game = ({ match, history, user, setHideMenu }) => {
   const [board, setBoard] = useState(null);
   const [activePiece, setActivePiece] = useState(null);
   const [totalMoves, setTotalMoves] = useState(0);
@@ -27,6 +29,7 @@ const Game = ({ match, history, user }) => {
   const toastID = 1;
 
   useEffect(() => {
+    setHideMenu(true);
     getGame(match.params.gameID)
       .then((game) => {
         if (!game.data.deleted && game.data.inProgress) {
@@ -38,8 +41,10 @@ const Game = ({ match, history, user }) => {
       })
       .catch((err) => {
         console.log(err);
-        toast.error('Error getting game data.');
+        toast.error("Error getting game data.");
       });
+
+    return () => setHideMenu(false);
   }, []);
 
   //   componentDidMount() {
@@ -53,33 +58,34 @@ const Game = ({ match, history, user }) => {
   const setUpGame = (gameData) => {
     const tempBoard = new Array(64).fill(null);
 
-    if (user.uid === gameData.player1) {
+    if (user.uid === gameData.player1.uid) {
       setPlayer({ uid: user.uid, player: 1 });
-    } else if (user.uid === gameData.player2) {
+    } else if (user.uid === gameData.player2.uid) {
       setPlayer({ uid: user.uid, player: 2 });
     } else {
-      history.push('/');
+      history.push("/");
     }
 
     gameData.board.map((x, i) => {
       if (x !== null) {
-        if (x.name === 'rook') {
-          tempBoard[i] = new rook('rook', x.player);
+        if (x.name === "rook") {
+          tempBoard[i] = new rook("rook", x.player);
         }
-        if (x.name === 'knight') {
-          tempBoard[i] = new knight('knight', x.player);
+        if (x.name === "knight") {
+          tempBoard[i] = new knight("knight", x.player);
         }
-        if (x.name === 'bishop') {
-          tempBoard[i] = new bishop('bishop', x.player);
+        if (x.name === "bishop") {
+          tempBoard[i] = new bishop("bishop", x.player);
         }
-        if (x.name === 'king') {
-          tempBoard[i] = new king('king', x.player);
+        if (x.name === "king") {
+          tempBoard[i] = new king("king", x.player);
         }
-        if (x.name === 'queen') {
-          tempBoard[i] = new queen('queen', x.player);
+        if (x.name === "queen") {
+          tempBoard[i] = new queen("queen", x.player);
         }
-        if (x.name === 'pawn') {
-          tempBoard[i] = new pawn('pawn', x.player);
+        if (x.name === "pawn") {
+          tempBoard[i] = new pawn("pawn", x.player);
+          tempBoard[i].firstMove = x.firstMove;
         }
       }
     });
@@ -92,30 +98,34 @@ const Game = ({ match, history, user }) => {
     if (player.player === turn) {
       //Set active piece
       if (activePiece === null && board[ID] && board[ID].getPlayer() === turn) {
-        console.log('Set Active Piece');
+        console.log("Set Active Piece");
         setCurrentPath(board[ID].getPath(ID, board));
         setActive(true, ID);
       }
       //Unset active piece by clicking it
       else if (activePiece === ID) {
-        console.log('Unset active piece');
+        console.log("Unset active piece");
         setActive(false, ID);
       }
       //Move piece if possible
-      else if (activePiece !== ID && activePiece !== null && currentPath.includes(ID)) {
-        console.log('Move piece if possible');
+      else if (
+        activePiece !== ID &&
+        activePiece !== null &&
+        currentPath.includes(ID)
+      ) {
+        console.log("Move piece if possible");
         movePiece(ID);
       }
       //Unset by clicking out of range
       else if (activePiece) {
-        console.log('Move piece if possible');
+        console.log("Move piece if possible");
         setActive(false, ID);
       }
     } else {
-      if(!toast.isActive(toastID)) {
-        toast.warn('Its not your turn right now.', {
+      if (!toast.isActive(toastID)) {
+        toast.warn("Its not your turn right now.", {
           toastId: toastID,
-          autoClose: 4000
+          autoClose: 4000,
         });
       }
     }
@@ -132,7 +142,7 @@ const Game = ({ match, history, user }) => {
 
   const movePiece = async (moveToID) => {
     //Remove first move for the pawn.
-    if (board[activePiece].getName() === 'pawn') {
+    if (board[activePiece].getName() === "pawn") {
       if (board[activePiece].isFirstMove()) board[activePiece].firstMoveOver();
     }
 
@@ -146,7 +156,7 @@ const Game = ({ match, history, user }) => {
       setActive(false);
       updateGame();
     } catch (err) {
-      toast.error('OH NOOO');
+      toast.error("OH NOOO");
     }
     // board.forEach((piece, i) => {
     //   if (piece) isKingChecked(piece, i);
@@ -167,7 +177,7 @@ const Game = ({ match, history, user }) => {
   // };
 
   const addToFallen = (piece) => {
-    if (board[piece].getName() === 'king') {
+    if (board[piece].getName() === "king") {
       gameOver();
     }
     setLostPieces([
@@ -203,17 +213,32 @@ const Game = ({ match, history, user }) => {
   };
 
   return (
-    <div className='game-container'>
+    <div className="game-container">
       {board ? (
-        <div className='chess-area'>
-          <div className='chess-board'>
+        <div className="chess-area">
+          <IconButton
+            aria-label="exit game"
+            size="small"
+            className="m-3"
+            onClick={() => history.push("/")}
+          >
+            <ClearIcon className="font-xl"/>
+          </IconButton>
+          <div className={`chess-board ${player.player === 1 ? 'flip' : ''}`}>
             {board.map((piece, id) => {
               return (
                 <BoardSquare
+                  flip={player.player === 1}
                   key={id}
                   piece={piece}
                   color={
-                    parseInt(id / 8) % 2 ? (id % 2 ? 'white' : 'grey') : id % 2 ? 'grey' : 'white'
+                    parseInt(id / 8) % 2
+                      ? id % 2
+                        ? "white"
+                        : "grey"
+                      : id % 2
+                      ? "grey"
+                      : "white"
                   }
                   onClick={() => handlePieceClick(id)}
                   active={id === activePiece}

@@ -1,4 +1,4 @@
-@import '../index.scss';
+@import '../Utils/variables.scss';
 
 .board-square {
   max-width: 50px;
@@ -9,14 +9,14 @@
   vertical-align: bottom;
   padding: 0;
   border-radius: 0;
+
+  &.active {
+    background: #448aff;
+  }
 }
 
 .grey {
   background-color: #ccc;
-}
-
-.active {
-  background: #448aff;
 }
 
 .path {

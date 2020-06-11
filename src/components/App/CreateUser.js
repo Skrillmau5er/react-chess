@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import {
   Avatar,
   Button,
@@ -8,13 +8,14 @@ import {
   Grid,
   Typography,
   Container,
-  LinearProgress
-} from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import { auth } from '../../services/firebase';
-import '../../styles/App/CreateUser.scss';
-import { createUser, checkUserName } from '../../services';
-import { toast } from 'react-toastify';
+  LinearProgress,
+} from "@material-ui/core";
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import { auth } from "../../services/firebase";
+import "../../styles/App/CreateUser.scss";
+import { createUser } from "../../services";
+import { toast } from "react-toastify";
+import queryString from "query-string";
 
 export default class CreateUserNew extends Component {
   state = {
@@ -26,18 +27,24 @@ export default class CreateUserNew extends Component {
     lastNameErr: null,
     email: null,
     emailErr: null,
-    userName: null,
-    userNameErr: null,
     password: null,
     passwordErr: null,
     password2: null,
-    password2Err: null
+    password2Err: null,
   };
+
+  componentDidMount() {
+    this.props.setHideMenu(true);
+  }
+
+  componentWillUnmount() {
+    this.props.setHideMenu(false);
+  }
 
   change = (event, field) => {
     this.setState(
       {
-        [field]: event.target.value
+        [field]: event.target.value,
       },
       () => {
         if (this.state.submitted) {
@@ -49,90 +56,78 @@ export default class CreateUserNew extends Component {
 
   validate = () => {
     let validationPassed = true;
-    const { firstName, lastName, email, userName, password, password2 } = this.state;
+    const { firstName, lastName, email, password, password2 } = this.state;
 
     this.setState({
       firstNameErr: null,
       lastNameErr: null,
       emailErr: null,
-      userNameErr: null,
       passwordErr: null,
-      password2Err: null
+      password2Err: null,
     });
 
     if (!firstName) {
       validationPassed = false;
-      this.setState({ firstNameErr: 'Please enter your first name.' });
+      this.setState({ firstNameErr: "Please enter your first name." });
     }
     if (!lastName) {
       validationPassed = false;
-      this.setState({ lastNameErr: 'Please enter your last name.' });
+      this.setState({ lastNameErr: "Please enter your last name." });
     }
     if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
       validationPassed = false;
-      this.setState({ emailErr: 'Not a valid email' });
-    }
-    if (!userName) {
-      validationPassed = false;
-      this.setState({ userNameErr: 'Please enter a username' });
+      this.setState({ emailErr: "Not a valid email" });
     }
     if (!password) {
       validationPassed = false;
-      this.setState({ passwordErr: 'Please enter a password' });
+      this.setState({ passwordErr: "Please enter a password" });
     } else if (password.length < 8) {
       validationPassed = false;
       this.setState({
-        passwordErr: 'Please enter a password atleast 8 characters long'
+        passwordErr: "Please enter a password atleast 8 characters long",
       });
     }
     if (!password2) {
       validationPassed = false;
-      this.setState({ password2Err: 'Please confirm your password' });
+      this.setState({ password2Err: "Please confirm your password" });
     } else if (password2.length < 8) {
       validationPassed = false;
       this.setState({
-        password2Err: 'Please enter a password atleast 8 characters long'
+        password2Err: "Please enter a password atleast 8 characters long",
       });
     }
     return validationPassed;
   };
 
-  onSumbit = async event => {
-    const { userName } = this.state;
+  onSumbit = async (event) => {
     event.preventDefault();
     this.setState({ submitted: true });
 
     if (this.validate()) {
       this.setState({ isLoading: true });
-      await checkUserName(userName)
-      .then(() => {
-        this.createNewUser();
-      })
-      .catch(err => {
-        this.setState({ isLoading: false });
-        toast.error(err.response.data);
-      })
+      this.createNewUser();
     }
   };
 
   createNewUser = async () => {
-    const { email, password, firstName, lastName, userName } = this.state;
+    const { email, password, firstName, lastName } = this.state;
     await auth
-        .createUserWithEmailAndPassword(email, password)
-        .then(async cred => {
-          let token = await cred.user.getIdToken(true);
-          let uid = cred.user.uid;
-          await createUser({ firstName, lastName, email, token, uid, userName });
-          this.props.history.push('/');
-        })
-        .catch(err => {
-          let errorMessage = err.message;
-          console.error(errorMessage);
-          toast.error(errorMessage);
-        })
-        .finally(() => {
-          this.setState({ isLoading: false });
-        });
+      .createUserWithEmailAndPassword(email, password)
+      .then(async (cred) => {
+        let token = await cred.user.getIdToken(true);
+        let uid = cred.user.uid;
+        let gameID = queryString.parse(this.props.location.search).game_id;
+        await createUser({ firstName, lastName, email, token, uid, gameID });
+        this.props.history.push("/");
+      })
+      .catch((err) => {
+        let errorMessage = err.message;
+        console.error(errorMessage);
+        toast.error(errorMessage);
+      })
+      .finally(() => {
+        this.setState({ isLoading: false });
+      });
   };
 
   render() {
@@ -141,124 +136,120 @@ export default class CreateUserNew extends Component {
       firstNameErr,
       lastNameErr,
       emailErr,
-      userNameErr,
       password,
       passwordErr,
       password2,
-      password2Err
+      password2Err,
     } = this.state;
     return (
       <>
-        {isLoading && <LinearProgress style={{ height: '5px' }} />}
-        <Container component='main' maxWidth='sm'>
+        {isLoading && <LinearProgress style={{ height: "5px" }} />}
+        <Container component="main" maxWidth="sm">
           <CssBaseline />
-          <div className='paper-container'>
-            <Avatar className='locked-out-icon'>
+          <div className="paper-container">
+            <Avatar className="locked-out-icon">
               <LockOutlinedIcon />
             </Avatar>
-            <Typography component='h1' variant='h5'>
+            <Typography component="h1" variant="h5">
               Create Quick Chess Acount
             </Typography>
-            <form className='signup-form'>
+            <form className="signup-form">
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    autoComplete='name given-name'
-                    name='firstName'
-                    variant='outlined'
+                    autoComplete="name given-name"
+                    name="firstName"
+                    variant="outlined"
                     fullWidth
-                    id='firstName'
-                    label='First Name'
+                    id="firstName"
+                    label="First Name"
                     error={firstNameErr ? true : false}
                     autoFocus
-                    onChange={e => this.change(e, 'firstName')}
+                    onChange={(e) => this.change(e, "firstName")}
                     helperText={firstNameErr}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    variant='outlined'
+                    variant="outlined"
                     fullWidth
-                    id='lastName'
-                    label='Last Name'
-                    name='lastName'
-                    autoComplete='name family-name'
-                    onChange={e => this.change(e, 'lastName')}
+                    id="lastName"
+                    label="Last Name"
+                    name="lastName"
+                    autoComplete="name family-name"
+                    onChange={(e) => this.change(e, "lastName")}
                     helperText={lastNameErr}
                     error={lastNameErr ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    variant='outlined'
+                    variant="outlined"
                     fullWidth
-                    id='email'
-                    label='Email Address'
-                    name='email'
-                    autoComplete='email'
-                    onChange={e => this.change(e, 'email')}
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    onChange={(e) => this.change(e, "email")}
                     helperText={emailErr}
                     error={emailErr ? true : false}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    variant='outlined'
+                    variant="outlined"
                     fullWidth
-                    id='userName'
-                    label='Username'
-                    name='userName'
-                    autoComplete='username'
-                    onChange={e => this.change(e, 'userName')}
-                    helperText={userNameErr}
-                    error={userNameErr ? true : false}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    variant='outlined'
-                    fullWidth
-                    name='password'
-                    label='Password'
-                    type='password'
-                    id='password'
-                    autoComplete='new-password'
-                    helperText={passwordErr ? passwordErr : 'Password must be atleat 8 characters'}
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    helperText={
+                      passwordErr
+                        ? passwordErr
+                        : "Password must be atleat 8 characters"
+                    }
                     error={passwordErr ? true : false}
-                    onChange={e => this.change(e, 'password')}
+                    onChange={(e) => this.change(e, "password")}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    variant='outlined'
+                    variant="outlined"
                     fullWidth
-                    name='password2'
-                    label='Confirm Password'
-                    type='password'
-                    id='password2'
-                    autoComplete='new-password'
-                    error={password !== password2 || (password2Err ? true : false)}
-                    onChange={e => this.change(e, 'password2')}
-                    helperText={password !== password2 ? 'Passwords do not match.' : password2Err}
+                    name="password2"
+                    label="Confirm Password"
+                    type="password"
+                    id="password2"
+                    autoComplete="new-password"
+                    error={
+                      password !== password2 || (password2Err ? true : false)
+                    }
+                    onChange={(e) => this.change(e, "password2")}
+                    helperText={
+                      password !== password2
+                        ? "Passwords do not match."
+                        : password2Err
+                    }
                   />
                 </Grid>
               </Grid>
               <Button
-                type='submit'
+                type="submit"
                 fullWidth
-                variant='contained'
-                color='primary'
-                className='submit-button'
+                variant="contained"
+                color="primary"
+                className="submit-button"
                 disabled={isLoading}
                 onClick={this.onSumbit}
               >
                 Sign Up
               </Button>
-              <Grid container justify='flex-end'>
+              <Grid container justify="flex-end">
                 <Grid item>
-                    <Link href='/' variant='body2'>
-                      Already have an account? Sign in
-                    </Link>
+                  <Link href="/" variant="body2">
+                    Already have an account? Sign in
+                  </Link>
                 </Grid>
               </Grid>
             </form>

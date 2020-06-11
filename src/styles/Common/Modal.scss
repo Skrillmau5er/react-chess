@@ -1,0 +1,19 @@
+.modal {
+  text-align: center;
+  white-space: pre-wrap;
+  background-color: white;
+  position: absolute;
+  max-width: 500px;
+  width: 95%;
+  border-radius: 8px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+
+  .close-modal-button {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+}

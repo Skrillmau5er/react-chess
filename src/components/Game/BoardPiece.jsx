@@ -41,7 +41,7 @@ export default function BoardPiece(props) {
   }
   return (
     <div className={`board-piece-container ${(props.fallen) ? 'fallen' : ''}`}>
-      <img className={`board-piece ${(props.fallen) ? 'fallen' : ''}`} src={img} alt="chess piece" />
+      <img className={`board-piece ${(props.fallen) ? 'fallen' : ''} ${props.flip ? 'flip' : ''}`} src={img} alt="chess piece" />
     </div>
   );
 }

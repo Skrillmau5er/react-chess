@@ -16,10 +16,6 @@ export const createUser = async data => {
   return await axios.post(`${root}/user/create`, data);
 };
 
-export const checkUserName = async userName => {
-  return await axios.get(`${root}/user/${userName}`);
-};
-
 export const createGame = async data => {
   return await axios.post(`${root}/game/create`, data);
 };

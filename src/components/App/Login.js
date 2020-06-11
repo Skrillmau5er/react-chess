@@ -4,11 +4,9 @@ import {
   CssBaseline,
   TextField,
   LinearProgress,
-  Link,
   Paper,
   Grid,
   Typography,
-  Modal,
 } from '@material-ui/core';
 import '../../styles/App/Login.scss';
 import { toast } from 'react-toastify';
@@ -16,6 +14,7 @@ import { auth, provider } from '../../services/firebase';
 import { createUser } from '../../services';
 import googleIcon from '../../assets/google-icon.png';
 import chessIcon from '../../assets/pawn-black.png';
+import Modal from '../Common/Modal';
 
 export default class LoginNew extends Component {
   state = {
@@ -31,6 +30,14 @@ export default class LoginNew extends Component {
     displayError: false,
     showForgotPassword: false,
   };
+
+  componentDidMount() {
+    this.props.setHideMenu(true);
+  };
+
+  componentWillUnmount() {
+    this.props.setHideMenu(false);
+  }
 
   validate = () => {
     let validationPassed = true;
@@ -148,13 +155,13 @@ export default class LoginNew extends Component {
       <>
         {isLoading && <LinearProgress style={{ height: '5px' }} />}
         <Modal open={showForgotPassword} onClose={this.closeForgotPassword}>
-          <div className='forget-password-container'>
             <Grid container component={Paper} elevation={6} alignContent='center' spacing={6}>
               <Grid item xs={12}>
                 <Typography component='h1' variant='h5'>
                   Forgot Password
                 </Typography>
                 <TextField
+                  className="my-4"
                   variant='outlined'
                   margin='normal'
                   id='email'
@@ -162,7 +169,7 @@ export default class LoginNew extends Component {
                   name='email'
                   autoComplete='email'
                   onChange={(e) => this.setState({ emailForgot: e.target.value })}
-                  helperText={emailForgotErr}
+                  helperText={emailForgotErr ? emailForgotErr : 'We will send you an email with a link to reset your password'}
                   fullWidth
                   error={emailForgotErr ? true : false}
                   autoFocus
@@ -180,15 +187,11 @@ export default class LoginNew extends Component {
                 </Button>
               </Grid>
             </Grid>
-          </div>
         </Modal>
         <Grid className='login-grid-container' container component='main'>
-          <CssBaseline />
-          <Grid item className='login-image-grid' xs={false} sm={4} md={7} />
-          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+          <Grid className="m-auto" item>
             <div className='login-item-container'>
-              {/* <img src={this.props.isInternal ? ybaLogo : cspLogoOnly} className="yba-logo"/> */}
-              <img src={chessIcon} className='chess-icon' />
+              <img src={chessIcon} className='chess-icon' alt="chess piece" />
               <Typography component='h1' variant='h5'>
                 Sign into Quick Chess
               </Typography>
@@ -249,17 +252,18 @@ export default class LoginNew extends Component {
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <Link
+                    <Button
                       onClick={() => this.setState({ showForgotPassword: true })}
-                      variant='body2'
+                      color="primary"
+                      size="small"
                     >
                       Forgot password?
-                    </Link>
+                    </Button>
                   </Grid>
                   <Grid item>
-                    <Link href='/createUser' variant='body2'>
-                      {"Don't have an account? Sign Up"}
-                    </Link>
+                    <Button onClick={() => this.props.history.push('/createUser')} color="primary" size="small">
+                      {"Sign Up"}
+                    </Button>
                   </Grid>
                 </Grid>
               </form>
