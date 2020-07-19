@@ -142,6 +142,8 @@ const Game = ({ match, history, user, setHideMenu }) => {
 
   const movePiece = async (moveToID) => {
     //Remove first move for the pawn.
+    animateMove(moveToID, activePiece);
+
     if (board[activePiece].getName() === "pawn") {
       if (board[activePiece].isFirstMove()) board[activePiece].firstMoveOver();
     }
@@ -161,6 +163,14 @@ const Game = ({ match, history, user, setHideMenu }) => {
     // board.forEach((piece, i) => {
     //   if (piece) isKingChecked(piece, i);
     // });
+  };
+
+  const animateMove = (newSpot, oldSpot) => {
+    let newRow = Math.floor(newSpot/8);
+    let oldRow = Math.floor(oldSpot/8);
+    let newCol = newSpot % 8;
+    let oldCol = oldSpot % 8;
+    let animationMove = [(oldRow-newRow * 50), (oldCol-newCol * 50)];
   };
 
   // const isKingChecked = (piece, ID) => {
@@ -188,7 +198,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
 
   const gameOver = async () => {
     let gameID = match.params.gameID;
-    await setGameOver({ gameID, winner: turn });
+    await setGameOver({ gameID, winner: player.uid });
     history.push(`/game/${gameID}/results`);
   };
 
@@ -218,13 +228,12 @@ const Game = ({ match, history, user, setHideMenu }) => {
         <div className="chess-area">
           <IconButton
             aria-label="exit game"
-            size="small"
-            className="m-3"
+            className="m-3 ml-4"
             onClick={() => history.push("/")}
           >
             <ClearIcon className="font-xl"/>
           </IconButton>
-          <div className={`chess-board ${player.player === 1 ? 'flip' : ''}`}>
+          <div className={`chess-board mt-5 ${player.player === 1 ? 'flip' : ''}`}>
             {board.map((piece, id) => {
               return (
                 <BoardSquare

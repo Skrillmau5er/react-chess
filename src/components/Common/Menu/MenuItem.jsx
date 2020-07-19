@@ -6,7 +6,7 @@ const MenuItem = ({ dest, active, setActive, icon, title }) => {
   return (
     <Link
       to={dest}
-      className={classNames("menu-link", active === dest ? "active" : "")}
+      className={classNames("menu-link", active === dest ? "active" : "", "py-1")}
       onClick={() => {
         setActive(dest);
       }}

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { withRouter } from 'react-router';
 import { Button, Grid, Typography, TextField, Paper } from "@material-ui/core";
 import { toast } from "react-toastify";
-import { createGame } from "../../services";
-import "../../styles/App/create-game.scss";
-import Modal from "../Common/Modal";
+import { createGame } from "../../../services";
+import "../../../styles/App/create-game.scss";
+import Modal from "../../Common/Modal";
 
 const CreateGame = ({player, history}) => {
   const [email, setEmail] = useState(null);
@@ -47,9 +47,9 @@ const CreateGame = ({player, history}) => {
   };
 
   return (
-    <div className="create-game-container align-center">
+    <div className="create-game-container text-center mb-6">
       <Button
-        className="create-game-btn mb-4"
+        className="create-game-btn"
         type="submit"
         fullWidth
         variant="outlined"
@@ -66,17 +66,17 @@ const CreateGame = ({player, history}) => {
           component={Paper}
           elevation={6}
           alignContent="center"
-          className="p-4"
+          className="p-6"
         >
           <Grid item xs={12}>
-            <Typography component="p" variant="h4">
-              New Game
+            <Typography component="p" variant="h4" color="primary">
+              Start New Game
             </Typography>
             <Typography className="mt-2" component="p" variant="body1">
-              Enter an email of a friend to send them an invite to your game.
+              Enter an email of a friend to send them an invitation to  game.
             </Typography>
             <TextField
-              className="my-4"
+              className="my-5"
               variant="outlined"
               margin="normal"
               id="email"

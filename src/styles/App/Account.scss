@@ -1,0 +1,38 @@
+@import "../Utils/variables.scss";
+
+.account-info-container {
+  display: flex;
+  justify-content: center;
+  .account-info {
+    background-color: $PrimaryColorLight !important;
+    width: 100%;
+    max-width: 500px;
+
+    .avatar-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .personal-info {
+      .edit-line {
+        display: flex;
+      }
+    }
+
+    .tool-tip {
+      font-size: 30px !important;
+    }
+
+    .change-avatar-button {
+      .avatar {
+        width: 70px;
+        height: 70px;
+      }
+    }
+
+    .account-action-area {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}

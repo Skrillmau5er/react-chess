@@ -10,14 +10,17 @@ import {
   Button,
 } from "@material-ui/core";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import "../../styles/App/CurrentGames.scss";
+import "../../../styles/App/CurrentGames.scss";
 import { Skeleton } from "@material-ui/lab";
 import { toast } from "react-toastify";
-import { getGamesByUser, deleteGame as deleteGameById } from "../../services";
+import { getGamesByUser, deleteGame as deleteGameById } from "../../../services";
 import moment from "moment";
+import DeleteGameModal from './DeleteGameModal';
 
 const CurrentGames = ({ history, uid }) => {
   const [games, setGames] = useState(null);
+  const [showDeleteGameModal, setShowDeleteGameModal] = useState(false);
+  const [game, setGame] = useState(null);
 
   useEffect(() => {
     getGames();
@@ -42,11 +45,15 @@ const CurrentGames = ({ history, uid }) => {
     return `${Math.floor(diff.asHours())} hours`;
   };
 
-  const deleteGame = (id) => {
-    deleteGameById(id)
+  const deleteGame = () => {
+    let players = game.gameData.players;
+    let winner = players[0] === uid ? players[1] : players[0];
+    console.log(winner);
+    deleteGameById(game.gameID, winner)
       .then((res) => {
         getGames();
         toast.success("Game Successfully deleted");
+        setShowDeleteGameModal(false);
       })
       .catch((err) => {
         toast.error("Error Deleting Game", err);
@@ -67,9 +74,16 @@ const CurrentGames = ({ history, uid }) => {
 
   return (
     <div className="current-games-container">
+      <Typography variant="h4" className="text-center mb-3">Current Games</Typography>
       <Grid container spacing={1}>
         {games ? (
-          games.map((game) => {
+          <>
+          <DeleteGameModal 
+            showDeleteGameModal={showDeleteGameModal}
+            setShowDeleteGameModal={setShowDeleteGameModal}
+            deleteGame={deleteGame}
+          />
+          {games.map((game) => {
             return (
               <Grid item xs={12} md={6} lg={4} xl={3}>
                 <Card className="game-card my-3" key={game.gameID}>
@@ -109,7 +123,10 @@ const CurrentGames = ({ history, uid }) => {
                     </Button>
                     <IconButton
                       size="small"
-                      onClick={() => deleteGame(game.gameID)}
+                      onClick={() => {
+                        setShowDeleteGameModal(true);
+                        setGame(game);
+                      }}
                     >
                       <DeleteOutlineIcon />
                     </IconButton>
@@ -117,7 +134,8 @@ const CurrentGames = ({ history, uid }) => {
                 </Card>
               </Grid>
             );
-          })
+          })}
+          </>
         ) : (
           <Grid container spacing={1}>
             <Grid item xs={12} md={6} lg={4} xl={3}>

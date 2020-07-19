@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+button:focus {
+  outline: none !important;
+}
+
+*,
+::before,
+::after {
+  box-sizing: unset;
+}

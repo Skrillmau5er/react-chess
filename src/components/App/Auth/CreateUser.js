@@ -11,9 +11,9 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { auth } from "../../services/firebase";
-import "../../styles/App/CreateUser.scss";
-import { createUser } from "../../services";
+import { auth } from "../../../services/firebase";
+import "../../../styles/App/CreateUser.scss";
+import { createUser } from "../../../services";
 import { toast } from "react-toastify";
 import queryString from "query-string";
 
@@ -117,12 +117,16 @@ export default class CreateUserNew extends Component {
         let token = await cred.user.getIdToken(true);
         let uid = cred.user.uid;
         let gameID = queryString.parse(this.props.location.search).game_id;
-        await createUser({ firstName, lastName, email, token, uid, gameID });
-        this.props.history.push("/");
+        try {
+          await createUser({ firstName, lastName, email, token, uid, gameID });
+          this.props.history.push("/");
+        } catch (err) {
+          console.log(err);
+        }
       })
       .catch((err) => {
         let errorMessage = err.message;
-        console.error(errorMessage);
+        console.log(err);
         toast.error(errorMessage);
       })
       .finally(() => {
