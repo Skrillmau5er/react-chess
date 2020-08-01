@@ -8,11 +8,20 @@ import bishop from "../Pieces/bishop";
 import knight from "../Pieces/knight";
 import pawn from "../Pieces/pawn";
 import king from "../Pieces/king";
-import { getGame, updateGame as gameUpdate, setGameOver } from "../../services";
+import {
+  getGame,
+  updateGame as gameUpdate,
+  setGameOver,
+  getUser,
+  deleteGame as deleteGameById,
+} from "../../services";
 import { toast } from "react-toastify";
 import { createAnimation } from "../Utils/SkeletonBoardAnimation";
-import { IconButton } from "@material-ui/core";
-import ClearIcon from "@material-ui/icons/Clear";
+import { IconButton, Menu, MenuItem } from "@material-ui/core";
+import ArrowBack from "@material-ui/icons/ArrowBack";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { Skeleton } from "@material-ui/lab";
+import DeleteGameModal from "../App/Home/DeleteGameModal";
 
 const Game = ({ match, history, user, setHideMenu }) => {
   const [board, setBoard] = useState(null);
@@ -21,11 +30,16 @@ const Game = ({ match, history, user, setHideMenu }) => {
   const [turn, setTurn] = useState(1);
   const [lostPieces, setLostPieces] = useState([]);
   const [currentPath, setCurrentPath] = useState([]);
+  const [gameMetaData, setGameMetaData] = useState();
   const [player, setPlayer] = useState(null);
+  const [opponent, setOpponent] = useState(null);
   const [kingCheckStatus, setKingCheckStatus] = useState({
     checked: false,
     player: null,
   });
+  const [showGameMenu, setShowGameMenu] = useState(false);
+  const [showDeleteGameModal, setShowDeleteGameModal] = useState(false);
+  const [gameMenuEl, setGameMenuEl] = useState(null);
   const toastID = 1;
 
   useEffect(() => {
@@ -55,7 +69,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
   //   clearInterval(this.interval);
   // }
 
-  const setUpGame = (gameData) => {
+  const setUpGame = async (gameData) => {
     const tempBoard = new Array(64).fill(null);
 
     if (user.uid === gameData.player1.uid) {
@@ -91,6 +105,20 @@ const Game = ({ match, history, user, setHideMenu }) => {
     });
     setTurn(gameData.turn);
     setTotalMoves(gameData.totalMoves);
+    delete gameData.board;
+    setGameMetaData(gameData);
+    try {
+      if(gameData.player2.uid) {
+      let newOpponent = await getUser(gameData.player2.uid);
+      setOpponent(newOpponent.data);
+      } else {
+        setOpponent(2);
+      }
+    } catch (err) {
+      toast.error(
+        "Failed to fetch Opponent data. They may have deleted their account."
+      );
+    }
     setBoard(tempBoard);
   };
 
@@ -166,11 +194,11 @@ const Game = ({ match, history, user, setHideMenu }) => {
   };
 
   const animateMove = (newSpot, oldSpot) => {
-    let newRow = Math.floor(newSpot/8);
-    let oldRow = Math.floor(oldSpot/8);
+    let newRow = Math.floor(newSpot / 8);
+    let oldRow = Math.floor(oldSpot / 8);
     let newCol = newSpot % 8;
     let oldCol = oldSpot % 8;
-    let animationMove = [(oldRow-newRow * 50), (oldCol-newCol * 50)];
+    let animationMove = [oldRow - newRow * 50, oldCol - newCol * 50];
   };
 
   // const isKingChecked = (piece, ID) => {
@@ -222,18 +250,69 @@ const Game = ({ match, history, user, setHideMenu }) => {
     }
   };
 
+  const handleMenuClick = (event) => {
+    setGameMenuEl(event.currentTarget);
+    setShowGameMenu(true);
+  };
+
+  const determineTurn = () => {
+    return player.player === turn ? user : opponent;
+  };
+
+  const deleteGame = () => {
+    deleteGameById(match.params.gameID, opponent.uid)
+      .then((res) => {
+        toast.success("Game Successfully forfeited");
+        history.push("/");
+      })
+      .catch((err) => {
+        toast.error("Error Forfeiting Game", err);
+        setShowGameMenu(false);
+      });
+  };
+
   return (
     <div className="game-container">
       {board ? (
         <div className="chess-area">
-          <IconButton
-            aria-label="exit game"
-            className="m-3 ml-4"
-            onClick={() => history.push("/")}
+          <div className="flex justify-between">
+            <DeleteGameModal
+              showDeleteGameModal={showDeleteGameModal}
+              setShowDeleteGameModal={setShowDeleteGameModal}
+              deleteGame={deleteGame}
+            />
+            <IconButton
+              aria-label="exit game"
+              className="m-3 ml-4"
+              onClick={() => history.push("/")}
+            >
+              <ArrowBack className="font-xl" />
+            </IconButton>
+            <IconButton
+              id="gameMenu"
+              aria-label="game options"
+              className="m-3 ml-4"
+              onClick={handleMenuClick}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Menu
+              anchorEl={gameMenuEl}
+              keepMounted
+              open={Boolean(showGameMenu)}
+              onClose={() => setShowGameMenu(false)}
+            >
+              <MenuItem onClick={() => setShowGameMenu(false)}>
+                Request Tie
+              </MenuItem>
+              <MenuItem onClick={() => setShowDeleteGameModal(true)}>Forfeit Game</MenuItem>
+              <MenuItem onClick={() => history.push("/")}>Exit</MenuItem>
+            </Menu>
+          </div>
+
+          <div
+            className={`chess-board mt-5 ${player.player === 1 ? "flip" : ""}`}
           >
-            <ClearIcon className="font-xl"/>
-          </IconButton>
-          <div className={`chess-board mt-5 ${player.player === 1 ? 'flip' : ''}`}>
             {board.map((piece, id) => {
               return (
                 <BoardSquare
@@ -256,10 +335,17 @@ const Game = ({ match, history, user, setHideMenu }) => {
               );
             })}
           </div>
-          <GameStatus turn={turn} kingCheckStatus={kingCheckStatus} />
+          <GameStatus
+            kingCheckStatus={kingCheckStatus}
+            user={determineTurn()}
+            totalMoves={totalMoves}
+          />
         </div>
       ) : (
-        createAnimation()
+        <>
+          {createAnimation()}
+          <Skeleton height={250} className="mx-auto w-100 max-w-md" />
+        </>
       )}
     </div>
   );

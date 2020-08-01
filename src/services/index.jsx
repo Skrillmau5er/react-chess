@@ -1,7 +1,10 @@
 import axios from "axios";
 let root;
-// root = "http://localhost:9000";
-root = 'https://quickchess.herokuapp.com';
+if (process.env.NODE_ENV === "development") {
+  root = process.env.REACT_APP_API_URL;
+} else {
+  root = "https://quickchess.herokuapp.com";
+}
 
 export const getGame = async (id) => {
   return await axios.get(`${root}/game/${id}`);
@@ -45,4 +48,8 @@ export const deleteUser = async (uid) => {
 
 export const getStats = async (uid) => {
   return await axios.get(`${root}/stats/${uid}`);
+};
+
+export const getUser = async (uid) => {
+  return await axios.get(`${root}/user/${uid}`);
 };

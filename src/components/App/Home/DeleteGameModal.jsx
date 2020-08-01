@@ -24,7 +24,7 @@ const DeleteGameModal = ({
             Forfeit Game?
           </Typography>
           <Typography className="mt-2" component="p" variant="body1">
-            You are about to forfeit your game with person. Forfeits will count 
+            You are about to forfeit your game with person. Forfeits will count
             as a loss in your stats.
           </Typography>
           <Button
@@ -35,7 +35,7 @@ const DeleteGameModal = ({
             className="mt-2"
             onClick={deleteGame}
           >
-            Forfeit Game?
+            Forfeit Game
           </Button>
         </Grid>
       </Grid>

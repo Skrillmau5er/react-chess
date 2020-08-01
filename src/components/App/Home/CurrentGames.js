@@ -48,7 +48,6 @@ const CurrentGames = ({ history, uid }) => {
   const deleteGame = () => {
     let players = game.gameData.players;
     let winner = players[0] === uid ? players[1] : players[0];
-    console.log(winner);
     deleteGameById(game.gameID, winner)
       .then((res) => {
         getGames();

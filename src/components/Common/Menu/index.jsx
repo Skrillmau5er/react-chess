@@ -16,7 +16,6 @@ import "../../../styles/App/Menu.scss";
 
 const Menu = ({ location, hide, user, history }) => {
   const [active, setActive] = useState(null);
-  const [selectedItem, setSelectedItem] = useState("home");
 
   useEffect(() => {
     setActive(location.pathname);
@@ -29,7 +28,7 @@ const Menu = ({ location, hide, user, history }) => {
   };
 
   const handleChange = (event, newValue) => {
-    setSelectedItem(newValue);
+    setActive(newValue);
   };
 
   return (
@@ -71,29 +70,29 @@ const Menu = ({ location, hide, user, history }) => {
         </div>
       </div>
       <div className={classnames("menu-mobile", hide ? "hide-menu" : "")}>
-        <BottomNavigation value={selectedItem} onChange={handleChange}>
+        <BottomNavigation value={active} showLabels onChange={handleChange}>
           <BottomNavigationAction
             label="Home"
-            value="home"
+            value="/"
             onClick={() => history.push('/')}
             icon={<HomeRoundedIcon />}
           />
           <BottomNavigationAction
             label="Account"
-            value="account"
+            value="/account"
             onClick={() => history.push('/account')}
             icon={<Avatar src={user ? user.photoURL : null} className="avatar" />}
           />
           <BottomNavigationAction
             label="Stats"
-            value="stats"
+            value="/stats"
             onClick={() => history.push('/stats')}
             icon={<PollRoundedIcon />}
           />
           <BottomNavigationAction
             label="Logout"
             onClick={signOut}
-            value="logout"
+            value="/logout"
             icon={<ExitToAppRoundedIcon />}
           />
         </BottomNavigation>
