@@ -112,7 +112,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
       let newOpponent = await getUser(gameData.player2.uid);
       setOpponent(newOpponent.data);
       } else {
-        setOpponent(2);
+        setOpponent(null);
       }
     } catch (err) {
       toast.error(
@@ -171,22 +171,29 @@ const Game = ({ match, history, user, setHideMenu }) => {
   const movePiece = async (moveToID) => {
     //Remove first move for the pawn.
     animateMove(moveToID, activePiece);
+    let tempPiece;
 
     if (board[activePiece].getName() === "pawn") {
       if (board[activePiece].isFirstMove()) board[activePiece].firstMoveOver();
     }
 
-    if (board[moveToID]) addToFallen(moveToID);
+    if (board[moveToID]) {
+      addToFallen(moveToID);
+      tempPiece = board[moveToID];
+    }
     board[moveToID] = board[activePiece];
     board[activePiece] = null;
     let gameID = match.params.gameID;
     try {
       await gameUpdate({ gameID, board, totalMoves, turn });
-      setBoard(board);
-      setActive(false);
       updateGame();
     } catch (err) {
-      toast.error("OH NOOO");
+      toast.error('We couldn\'nt complete your move. Please try again later');
+      board[activePiece] = board[moveToID];
+      board[moveToID] = tempPiece;
+    } finally {
+      setActive(false);
+      setBoard(board);
     }
     // board.forEach((piece, i) => {
     //   if (piece) isKingChecked(piece, i);

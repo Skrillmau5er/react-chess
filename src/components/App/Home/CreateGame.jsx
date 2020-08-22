@@ -32,8 +32,7 @@ const CreateGame = ({player, history}) => {
           history.push(`/game/${gameID}`);
         });
       } catch (err) {
-        console.log(err);
-        // toast.error(err.response.data);
+        toast.error(err.response.data);
       } finally {
         setSubmitted(false);
       }

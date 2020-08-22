@@ -9,8 +9,8 @@ const GameStatus = ({ user, totalMoves }) => {
         <div className="flex justify-around">
           <div className="flex flex-col items-center">
             <Typography variant="h6">Turn</Typography>
-            <Avatar src={user.photoURL}></Avatar>
-            <Typography className="pt-2">{user.displayName}</Typography>
+            <Avatar src={user && user.photoURL}></Avatar>
+            <Typography className="pt-2">{user && user.displayName}</Typography>
           </div>
           <div className="flex items-center">
             <Typography variant="h6" className="inline-block pr-2">Total Moves: </Typography>
