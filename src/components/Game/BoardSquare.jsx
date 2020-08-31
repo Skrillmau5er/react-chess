@@ -3,19 +3,19 @@ import BoardPiece from "./BoardPiece";
 import "../../styles/Game/BoardSquare.scss";
 import { Button } from "@material-ui/core";
 
-const BoardSquare = (props) => {
+const BoardSquare = ({ color, active, path, onClick, piece, flip }) => {
   return (
     <div
-      className={`board-square ${props.color} ${props.active ? "active" : ""} ${
-        props.path ? "path" : ""
+      className={`board-square ${color} ${active ? "active" : ""} ${
+        path ? "path" : ""
       }`}
-      onClick={props.onClick}
+      onClick={onClick}
     >
-      {props.piece && (
+      {piece && (
         <BoardPiece
-          piece={props.piece.getName()}
-          player={props.piece.getPlayer()}
-          flip={props.flip}
+          piece={piece.getName()}
+          player={piece.getPlayer()}
+          flip={flip}
         />
       )}
     </div>

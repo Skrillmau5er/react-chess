@@ -31,6 +31,7 @@ export const deleteGame = async (gameID, uid) => {
 };
 
 export const updateGame = async (data) => {
+  console.log(data);
   return await axios.put(`${root}/game/update`, data);
 };
 

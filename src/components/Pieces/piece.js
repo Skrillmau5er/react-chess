@@ -4,11 +4,11 @@ export default class Piece {
     this.player = player;
   }
 
-  getName(){
+  getName = () => {
     return this.name;
   }
   
-  getPlayer(){
+  getPlayer = () => {
     return this.player;
   }
 }

@@ -5,14 +5,17 @@ module.exports = {
   },
   purge: [],
   theme: {
-    colors: {
-      bgColor: "#424242",
-      bgColorDark: "#313131",
-      bgColorLight: "#525252",
-      primary: "#EC625F",
-      secondary: "#448AFF",
+    extend: {
+      colors: {
+        bgColor: "#424242",
+        bgColorDark: "#313131",
+        bgColorLight: "#525252",
+        primary: "#EC625F",
+        secondary: "#448AFF",
+        black: "#000000",
+        white: "#ffffff"
+      },
     },
-    extend: {},
   },
   variants: {},
   plugins: [],

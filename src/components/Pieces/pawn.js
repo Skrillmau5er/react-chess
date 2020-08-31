@@ -1,27 +1,32 @@
-import piece from './piece';
+import piece from "./piece";
+import { getColumn, withInBoardLimits } from "./helperFunctions";
 
 export default class pawn extends piece {
   constructor(name, player) {
     super(name, player);
     this.firstMove = true;
+    this.attackOptions = [7,9];
+    this.moveOptions = [8];
+    this.firstMoveOptions = [16];
   }
-  isFirstMove() {
+
+  isFirstMove = () => {
     return this.firstMove;
   }
 
-  getPath(ID, board) {
+  getPath = (ID, board) => {
     let path = [];
-    if (board[ID].getPlayer() === 1) {
-      if (this.canAttack(board, ID + 7, ID, 'L')) path.push(ID + 7);
-      if (this.canAttack(board, ID + 9, ID, 'R')) path.push(ID + 9);
+    if (this.player === 1) {
+      if (this.canAttack(board, ID + 7, ID, "L")) path.push(ID + 7);
+      if (this.canAttack(board, ID + 9, ID, "R")) path.push(ID + 9);
 
       if (board[ID + 8] === null) {
         path.push(ID + 8);
         if (board[ID + 16] === null && this.firstMove) path.push(ID + 16);
       }
     } else {
-      if (this.canAttack(board, ID - 7, ID, 'R')) path.push(ID - 7);
-      if (this.canAttack(board, ID - 9, ID, 'L')) path.push(ID - 9);
+      if (this.canAttack(board, ID - 7, ID, "R")) path.push(ID - 7);
+      if (this.canAttack(board, ID - 9, ID, "L")) path.push(ID - 9);
 
       if (board[ID - 8] === null) {
         path.push(ID - 8);
@@ -29,25 +34,25 @@ export default class pawn extends piece {
       }
     }
     return path;
-  }
+  };
 
-  firstMoveOver() {
+  firstMoveOver = () => {
     this.firstMove = false;
   }
 
-  canAttack(board, attackID, ID, direction) {
+  canAttack = (board, attackID, ID, direction) => {
     let columnAttack;
-    if (attackID >= 0 && attackID <= 63) {
-      if (direction === 'L') {
-        columnAttack = ID % 8 ? true : false;
+    let enPassant = false;
+    let attackIDHasOpponent = board[attackID] !== null && board[attackID].getPlayer() !== this.player;
+
+    if (withInBoardLimits(attackID)) {
+      let column = getColumn(ID);
+      if (direction === "L") {
+        columnAttack = column !== 1;
       } else {
-        columnAttack = ID % 8 === 7 ? false : true;
+        columnAttack = column !== 8;
       }
-      return (
-        board[attackID] !== null &&
-        board[attackID].getPlayer() !== board[ID].getPlayer() &&
-        columnAttack
-      );
+      return (attackIDHasOpponent && columnAttack) || enPassant;
     } else {
       return false;
     }

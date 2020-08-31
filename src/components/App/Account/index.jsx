@@ -9,17 +9,21 @@ import {
 } from "@material-ui/core";
 import Zoom from "@material-ui/core/Zoom";
 import "../../../styles/App/Account.scss";
-import { storage, auth } from "../../../services/firebase";
+import { storage } from "../../../services/firebase";
 import { toast } from "react-toastify";
 import AccountInfoSection from "./AccountInfoSection";
 import DeleteAccount from "./DeleteAccount";
 import ChangePassword from "./ChangePassword";
+import AccountInfoEdit from "./AccountInfoEdit";
 
 const Account = ({ user, setUser }) => {
   const [avatar, setAvatar] = useState();
   const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [displayName, setDisplayName] = useState(user.displayName);
+  const [email, setEmail] = useState(user.email);
 
   useEffect(() => {
     setAvatar(user.photoURL);
@@ -29,6 +33,36 @@ const Account = ({ user, setUser }) => {
       }
     });
   }, []);
+
+  const updateUserDisplayName = () => {
+      user
+        .updateProfile({
+          displayName: displayName,
+        })
+        .then(
+          () => {
+            let newName = user.displayName;
+            setEditing(null);
+            setDisplayName(newName);
+          },
+          (error) => {
+            toast.error(error.message);
+          }
+        );
+  };
+
+  const updateUserEmail = () => {
+    user.updateEmail(email)
+    .then(
+      () => {
+        console.log(user);
+        setEditing(null);
+      },
+      (error) => {
+        toast.error(error.message);
+      }
+    );
+  };
 
   const uploadAvatarPhoto = () => {
     document.getElementById("fileButton").click();
@@ -76,6 +110,12 @@ const Account = ({ user, setUser }) => {
       });
   };
 
+  const onCancelEdit = () => {
+    setEditing(null);
+    setDisplayName(user.displayName);
+    setEmail(user.email);
+  };
+
   return (
     <div className="account-container m-3">
       <DeleteAccount
@@ -111,13 +151,48 @@ const Account = ({ user, setUser }) => {
             </Tooltip>
           </div>
           <div className="personal-info">
-            <AccountInfoSection label="Dislay Name" value={user.displayName} />
-            <AccountInfoSection label="Email" value={user.email} />
+            {editing === "displayName" ? (
+              <AccountInfoEdit
+                value={displayName}
+                type="name"
+                setNewValue={setDisplayName}
+                label="Change your Display Name"
+                onCancel={onCancelEdit}
+                onSubmit={updateUserDisplayName}
+              />
+            ) : (
+              <AccountInfoSection
+                label="Display Name"
+                value={user.displayName}
+                onEdit={() => setEditing("displayName")}
+                disabled={editing && editing !== "displayName"}
+              />
+            )}
+            {editing === "email" ? (
+              <AccountInfoEdit
+                value={email}
+                type="email"
+                setNewValue={setEmail}
+                label="Change your Email"
+                onCancel={onCancelEdit}
+                onSubmit={updateUserEmail}
+              />
+            ) : (
+              <AccountInfoSection
+                label="Email"
+                value={user.email}
+                onEdit={() => setEditing("email")}
+                disabled={editing && editing !== "email"}
+              />
+            )}
           </div>
           <div className="account-action-area mt-5">
             {showChangePassword && (
               <>
-                <Button color="secondary" onClick={() => setShowChangePasswordModal(true)}>
+                <Button
+                  color="secondary"
+                  onClick={() => setShowChangePasswordModal(true)}
+                >
                   Change Password
                 </Button>
                 <ChangePassword

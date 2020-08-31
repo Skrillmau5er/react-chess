@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import classNames from "classnames";
 import "../../styles/Game/ChessBoard.scss";
 import BoardSquare from "./BoardSquare";
 import GameStatus from "./GameStatus";
@@ -17,7 +18,15 @@ import {
 } from "../../services";
 import { toast } from "react-toastify";
 import { createAnimation } from "../Utils/SkeletonBoardAnimation";
-import { IconButton, Menu, MenuItem } from "@material-ui/core";
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+  Typography,
+  Paper,
+} from "@material-ui/core";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Skeleton } from "@material-ui/lab";
@@ -30,7 +39,6 @@ const Game = ({ match, history, user, setHideMenu }) => {
   const [turn, setTurn] = useState(1);
   const [lostPieces, setLostPieces] = useState([]);
   const [currentPath, setCurrentPath] = useState([]);
-  const [gameMetaData, setGameMetaData] = useState();
   const [player, setPlayer] = useState(null);
   const [opponent, setOpponent] = useState(null);
   const [kingCheckStatus, setKingCheckStatus] = useState({
@@ -40,16 +48,23 @@ const Game = ({ match, history, user, setHideMenu }) => {
   const [showGameMenu, setShowGameMenu] = useState(false);
   const [showDeleteGameModal, setShowDeleteGameModal] = useState(false);
   const [gameMenuEl, setGameMenuEl] = useState(null);
-  const toastID = 1;
+  const [whatIfMode, setWhatIfMode] = useState(false);
+  const [flipBoard, setFlipBoard] = useState(false);
+  const [showBoardError, setShowBoardError] = useState(false);
 
   useEffect(() => {
     setHideMenu(true);
+    setUpGame();
+    return () => setHideMenu(false);
+  }, []);
+
+  const setUpGame = () => {
     getGame(match.params.gameID)
       .then((game) => {
         if (!game.data.deleted && game.data.inProgress) {
-          setUpGame(game.data);
+          setUpGameData(game.data);
         } else {
-          // Becuase there is two history pushes, it is impossible to get back to home through the back button if the game is over.
+          // Because there is two history pushes, it is impossible to get back to home through the back button if the game is over.
           history.push(`/game/${match.params.gameID}/results`);
         }
       })
@@ -57,9 +72,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
         console.log(err);
         toast.error("Error getting game data.");
       });
-
-    return () => setHideMenu(false);
-  }, []);
+  };
 
   //   componentDidMount() {
   //     this.interval = setInterval(() => this.tick(), 1000);
@@ -69,7 +82,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
   //   clearInterval(this.interval);
   // }
 
-  const setUpGame = async (gameData) => {
+  const setUpGameData = async (gameData) => {
     const tempBoard = new Array(64).fill(null);
 
     if (user.uid === gameData.player1.uid) {
@@ -84,6 +97,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
       if (x !== null) {
         if (x.name === "rook") {
           tempBoard[i] = new rook("rook", x.player);
+          tempBoard[i].firstMove = x.firstMove;
         }
         if (x.name === "knight") {
           tempBoard[i] = new knight("knight", x.player);
@@ -93,6 +107,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
         }
         if (x.name === "king") {
           tempBoard[i] = new king("king", x.player);
+          tempBoard[i].firstMove = x.firstMove;
         }
         if (x.name === "queen") {
           tempBoard[i] = new queen("queen", x.player);
@@ -105,12 +120,11 @@ const Game = ({ match, history, user, setHideMenu }) => {
     });
     setTurn(gameData.turn);
     setTotalMoves(gameData.totalMoves);
-    delete gameData.board;
-    setGameMetaData(gameData);
+
     try {
-      if(gameData.player2.uid) {
-      let newOpponent = await getUser(gameData.player2.uid);
-      setOpponent(newOpponent.data);
+      if (gameData.player2.uid) {
+        let newOpponent = await getUser(gameData.player2.uid);
+        setOpponent(newOpponent.data);
       } else {
         setOpponent(null);
       }
@@ -122,8 +136,8 @@ const Game = ({ match, history, user, setHideMenu }) => {
     setBoard(tempBoard);
   };
 
-  const handlePieceClick = (ID) => {
-    if (player.player === turn) {
+  const handleBoardSquareClick = (ID) => {
+    if (player.player === turn || whatIfMode) {
       //Set active piece
       if (activePiece === null && board[ID] && board[ID].getPlayer() === turn) {
         console.log("Set Active Piece");
@@ -150,12 +164,14 @@ const Game = ({ match, history, user, setHideMenu }) => {
         setActive(false, ID);
       }
     } else {
-      if (!toast.isActive(toastID)) {
-        toast.warn("Its not your turn right now.", {
-          toastId: toastID,
-          autoClose: 4000,
-        });
-      }
+      handleBoardError();
+    }
+  };
+
+  const handleBoardError = () => {
+    if (!showBoardError) {
+      setShowBoardError(true);
+      setTimeout(() => setShowBoardError(false), 500);
     }
   };
 
@@ -169,31 +185,47 @@ const Game = ({ match, history, user, setHideMenu }) => {
   };
 
   const movePiece = async (moveToID) => {
-    //Remove first move for the pawn.
     animateMove(moveToID, activePiece);
-    let tempPiece;
+    let tempBoard = board;
+    let firstMoveTrackers = ["pawn", "rook", "king"];
 
-    if (board[activePiece].getName() === "pawn") {
-      if (board[activePiece].isFirstMove()) board[activePiece].firstMoveOver();
+    if (tempBoard[activePiece].getName() === "king") {
+      if (
+        tempBoard[activePiece]
+          .getCastlePath(board, activePiece)
+          .includes(moveToID)
+      ) {
+        let rookMove = tempBoard[activePiece].getRookCastleSpot(moveToID);
+        tempBoard[rookMove[1]] = tempBoard[rookMove[0]];
+        tempBoard[rookMove[0]] = null;
+      }
     }
 
-    if (board[moveToID]) {
+    if (firstMoveTrackers.includes(tempBoard[activePiece].getName())) {
+      if (tempBoard[activePiece].isFirstMove())
+        tempBoard[activePiece].firstMoveOver();
+    }
+
+    if (tempBoard[moveToID]) {
       addToFallen(moveToID);
-      tempPiece = board[moveToID];
     }
-    board[moveToID] = board[activePiece];
-    board[activePiece] = null;
-    let gameID = match.params.gameID;
-    try {
-      await gameUpdate({ gameID, board, totalMoves, turn });
+    tempBoard[moveToID] = tempBoard[activePiece];
+    tempBoard[activePiece] = null;
+    if (whatIfMode) {
+      setBoard(tempBoard);
       updateGame();
-    } catch (err) {
-      toast.error('We couldn\'nt complete your move. Please try again later');
-      board[activePiece] = board[moveToID];
-      board[moveToID] = tempPiece;
-    } finally {
       setActive(false);
-      setBoard(board);
+    } else {
+      let gameID = match.params.gameID;
+      try {
+        await gameUpdate({ gameID, board: tempBoard, totalMoves, turn });
+        setBoard(tempBoard);
+        updateGame();
+      } catch (err) {
+        toast.error("We couldn'nt complete your move. Please try again later");
+      } finally {
+        setActive(false);
+      }
     }
     // board.forEach((piece, i) => {
     //   if (piece) isKingChecked(piece, i);
@@ -278,6 +310,28 @@ const Game = ({ match, history, user, setHideMenu }) => {
       });
   };
 
+  const determineSquareColor = (id) => {
+    return parseInt(id / 8) % 2
+      ? id % 2
+        ? "white"
+        : "grey"
+      : id % 2
+      ? "grey"
+      : "white";
+  };
+
+  const toggleWhatIfMode = () => {
+    if (whatIfMode) {
+      setWhatIfMode(false);
+      setFlipBoard(false);
+      setUpGame();
+    } else {
+      setWhatIfMode(true);
+      setTimeout(() => setFlipBoard(true), 500);
+    }
+    setShowGameMenu(false);
+  };
+
   return (
     <div className="game-container">
       {board ? (
@@ -309,16 +363,43 @@ const Game = ({ match, history, user, setHideMenu }) => {
               open={Boolean(showGameMenu)}
               onClose={() => setShowGameMenu(false)}
             >
-              <MenuItem onClick={() => setShowGameMenu(false)}>
-                Request Tie
+              <MenuItem onClick={toggleWhatIfMode}>What If Mode</MenuItem>
+              <MenuItem onClick={() => setShowDeleteGameModal(true)}>
+                Forfeit Game
               </MenuItem>
-              <MenuItem onClick={() => setShowDeleteGameModal(true)}>Forfeit Game</MenuItem>
               <MenuItem onClick={() => history.push("/")}>Exit</MenuItem>
             </Menu>
           </div>
-
+          {whatIfMode && (
+            <div className="text-center flex flex-col justify-center">
+              <Typography variant="h5" component="div">
+                What If Mode Enabled
+              </Typography>
+              <div>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={flipBoard}
+                      onChange={() => setFlipBoard(!flipBoard)}
+                      color="primary"
+                    />
+                  }
+                  label="Flip board after each turn"
+                />
+              </div>
+            </div>
+          )}
+          {showBoardError && (
+              <Paper className="not-your-turn absolute bg-red-500 p-4">
+                It's not your turn yet!
+              </Paper>
+          )}
           <div
-            className={`chess-board mt-5 ${player.player === 1 ? "flip" : ""}`}
+            className={classNames(
+              "chess-board transition duration-500 mt-5",
+              showBoardError && "board-error",
+              player.player === 1 && "flip"
+            )}
           >
             {board.map((piece, id) => {
               return (
@@ -326,16 +407,8 @@ const Game = ({ match, history, user, setHideMenu }) => {
                   flip={player.player === 1}
                   key={id}
                   piece={piece}
-                  color={
-                    parseInt(id / 8) % 2
-                      ? id % 2
-                        ? "white"
-                        : "grey"
-                      : id % 2
-                      ? "grey"
-                      : "white"
-                  }
-                  onClick={() => handlePieceClick(id)}
+                  color={determineSquareColor(id)}
+                  onClick={() => handleBoardSquareClick(id)}
                   active={id === activePiece}
                   path={currentPath ? currentPath.includes(id) : false}
                 />
@@ -345,7 +418,9 @@ const Game = ({ match, history, user, setHideMenu }) => {
           <GameStatus
             kingCheckStatus={kingCheckStatus}
             user={determineTurn()}
+            turn={turn}
             totalMoves={totalMoves}
+            player={player}
           />
         </div>
       ) : (

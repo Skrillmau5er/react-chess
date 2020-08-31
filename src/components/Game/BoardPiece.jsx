@@ -15,33 +15,33 @@ import pawnW from '../../assets/pawn-white.png';
 import queenW from '../../assets/queen-white.png';
 import rookW from '../../assets/rook-white.png';
 
-export default function BoardPiece(props) {
+export default function BoardPiece({ piece, player, fallen, flip }) {
   let img = null;
   // Find image for piece
   // eslint-disable-next-line default-case
-  switch(props.piece) {
+  switch(piece) {
     case 'rook':
-      img = (props.player === 1) ? rookB : rookW;
+      img = (player === 1) ? rookB : rookW;
       break;
     case 'bishop':
-      img = (props.player === 1) ? bishopB : bishopW;
+      img = (player === 1) ? bishopB : bishopW;
       break;
     case 'knight':
-      img = (props.player === 1) ? knightB : knightW;
+      img = (player === 1) ? knightB : knightW;
       break;
     case 'queen':
-      img = (props.player === 1) ? queenB : queenW;
+      img = (player === 1) ? queenB : queenW;
       break;
     case 'pawn':
-      img = (props.player === 1) ? pawnB : pawnW;
+      img = (player === 1) ? pawnB : pawnW;
       break;
     case 'king':
-      img = (props.player === 1) ? kingB : kingW;
+      img = (player === 1) ? kingB : kingW;
       break;
   }
   return (
-    <div className={`board-piece-container ${(props.fallen) ? 'fallen' : ''}`}>
-      <img className={`board-piece ${(props.fallen) ? 'fallen' : ''} ${props.flip ? 'flip' : ''}`} src={img} alt="chess piece" />
+    <div className={`board-piece-container ${(fallen) ? 'fallen' : ''}`}>
+      <img className={`board-piece ${(fallen) ? 'fallen' : ''} ${flip ? 'flip' : ''}`} src={img} alt="chess piece" />
     </div>
   );
 }
