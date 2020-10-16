@@ -2,10 +2,10 @@ import piece from "./piece";
 import { withInBoardLimits, getColumn } from "./helperFunctions";
 
 export default class knight extends piece {
-  constructor(name, player) {
-    super(name, player);
-    this.moveOptions = [6, 10, 15, 17, -6, -10, -15, -17];
-    this.moveOptionsRight = [10, 17, -6, -15];
+  moveOptions = [6, 10, 15, 17, -6, -10, -15, -17];
+  moveOptionsRight = [10, 17, -6, -15];
+  constructor(player) {
+    super("knight", player);
   }
 
   getPath = (ID, board) => {

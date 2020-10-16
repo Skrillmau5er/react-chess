@@ -20,15 +20,14 @@
     width: 80%;
     height: 80%;
     padding: 10%;
+    position: absolute;
+    transition: all 0.6s ease;
+    z-index: 10;
 
     &.fallen {
       width: 50px;
       padding: 10px;
       display: inline;
-    }
-
-    &.flip {
-      transform: rotate(180deg);
     }
   }
 }

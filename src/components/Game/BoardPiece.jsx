@@ -1,47 +1,95 @@
-import React from 'react';
-import '../../styles/Game/BoardPiece.scss';
+import React, { useState, useEffect } from "react";
+import "../../styles/Game/BoardPiece.scss";
 
 //Images for board piece
-import bishopB from '../../assets/bishop-black.png';
-import kingB from '../../assets/king-black.png';
-import knightB from '../../assets/knight-black.png';
-import pawnB from '../../assets/pawn-black.png';
-import queenB from '../../assets/queen-black.png';
-import rookB from '../../assets/rook-black.png';
-import bishopW from '../../assets/bishop-white.png';
-import kingW from '../../assets/king-white.png';
-import knightW from '../../assets/knight-white.png';
-import pawnW from '../../assets/pawn-white.png';
-import queenW from '../../assets/queen-white.png';
-import rookW from '../../assets/rook-white.png';
+import bishopB from "../../assets/bishop-black.png";
+import kingB from "../../assets/king-black.png";
+import knightB from "../../assets/knight-black.png";
+import pawnB from "../../assets/pawn-black.png";
+import queenB from "../../assets/queen-black.png";
+import rookB from "../../assets/rook-black.png";
+import bishopW from "../../assets/bishop-white.png";
+import kingW from "../../assets/king-white.png";
+import knightW from "../../assets/knight-white.png";
+import pawnW from "../../assets/pawn-white.png";
+import queenW from "../../assets/queen-white.png";
+import rookW from "../../assets/rook-white.png";
+import classNames from "classnames";
 
-export default function BoardPiece({ piece, player, fallen, flip }) {
-  let img = null;
-  // Find image for piece
-  // eslint-disable-next-line default-case
-  switch(piece) {
-    case 'rook':
-      img = (player === 1) ? rookB : rookW;
-      break;
-    case 'bishop':
-      img = (player === 1) ? bishopB : bishopW;
-      break;
-    case 'knight':
-      img = (player === 1) ? knightB : knightW;
-      break;
-    case 'queen':
-      img = (player === 1) ? queenB : queenW;
-      break;
-    case 'pawn':
-      img = (player === 1) ? pawnB : pawnW;
-      break;
-    case 'king':
-      img = (player === 1) ? kingB : kingW;
-      break;
-  }
+const BoardPiece = ({ piece, fallen, flip, lastMoveAnimation, lastPieceTaken }) => {
+  const [animationStyle, setAnimationStyle] = useState(null);
+
+  useEffect(() => {
+    console.log(lastMoveAnimation);
+    getPieceImage();
+    determineStyle();
+  }, [lastMoveAnimation]);
+
+  const getPieceImage = (piece) => {
+    let pieceImg = null;
+    // Find image for piece
+    // eslint-disable-next-line default-case
+    switch (piece?.getName() || null) {
+      case "rook":
+        pieceImg = piece.getPlayer() === 0 ? rookB : rookW;
+        break;
+      case "bishop":
+        pieceImg = piece.getPlayer() === 0 ? bishopB : bishopW;
+        break;
+      case "knight":
+        pieceImg = piece.getPlayer() === 0 ? knightB : knightW;
+        break;
+      case "queen":
+        pieceImg = piece.getPlayer() === 0 ? queenB : queenW;
+        break;
+      case "pawn":
+        pieceImg = piece.getPlayer() === 0 ? pawnB : pawnW;
+        break;
+      case "king":
+        pieceImg = piece.getPlayer() === 0 ? kingB : kingW;
+        break;
+    }
+    return pieceImg;
+  };
+
+  const determineStyle = () => {
+    if (lastMoveAnimation) {
+      let style = {
+        position: "absolute",
+        transition: "all 1s ease",
+        left: lastMoveAnimation.animationMove[0],
+        top: lastMoveAnimation.animationMove[1],
+      };
+      setAnimationStyle(style);
+      setTimeout(() => setAnimationStyle({ left: 0, top: 0 }), 1000);
+    }
+  };
+
   return (
-    <div className={`board-piece-container ${(fallen) ? 'fallen' : ''}`}>
-      <img className={`board-piece ${(fallen) ? 'fallen' : ''} ${flip ? 'flip' : ''}`} src={img} alt="chess piece" />
+    <div className={classNames("board-piece-container", fallen && "fallen")}>
+      <img
+        style={animationStyle}
+        className={classNames(
+          "board-piece",
+          fallen && "fallen",
+          flip && "transform rotate-180"
+        )}
+        src={getPieceImage(piece)}
+        alt="chess piece"
+      />
+      {lastPieceTaken && (
+        <img
+          className={classNames(
+            "board-piece",
+            fallen && "fallen",
+            flip && "transform rotate-180"
+          )}
+          src={getPieceImage(lastMoveAnimation.pieceTaken.piece)}
+          alt="chess piece"
+        />
+      )}
     </div>
   );
-}
+};
+
+export default BoardPiece;

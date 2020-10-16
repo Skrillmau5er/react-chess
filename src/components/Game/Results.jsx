@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../../styles/Game/Results.scss';
-import BoardPiece from './BoardPiece';
 import Button from '@material-ui/core/Button';
 import { getGame } from '../../services';
 import { toast } from 'react-toastify';

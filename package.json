@@ -20,6 +20,7 @@
     "query-string": "^6.13.0",
     "react": "^16.8.6",
     "react-chartjs-2": "^2.9.0",
+    "react-confetti": "^6.0.0",
     "react-dom": "^16.8.6",
     "react-make-it-rain": "0.0.2",
     "react-redux": "^7.2.0",
@@ -33,13 +34,10 @@
   "scripts": {
     "build:tailwind": "postcss src/tailwind.css -o src/tailwind.generated.css",
     "watch:tailwind": "postcss -w src/tailwind.css -o src/tailwind.generated.css",
-  
     "start": "run-p watch:tailwind start:react",
     "start:react": "react-scripts start",
-  
     "prebuild": "npm run build:tailwind",
     "build": "react-scripts build",
-  
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

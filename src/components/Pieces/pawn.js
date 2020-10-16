@@ -2,12 +2,12 @@ import piece from "./piece";
 import { getColumn, withInBoardLimits } from "./helperFunctions";
 
 export default class pawn extends piece {
-  constructor(name, player) {
-    super(name, player);
-    this.firstMove = true;
-    this.attackOptions = [7,9];
-    this.moveOptions = [8];
-    this.firstMoveOptions = [16];
+  attackOptions = [7,9];
+  moveOptions = [8];
+  firstMoveOptions = [16];
+  constructor(player, firstMove) {
+    super("pawn", player);
+    this.firstMove = firstMove;
   }
 
   isFirstMove = () => {
@@ -16,7 +16,7 @@ export default class pawn extends piece {
 
   getPath = (ID, board) => {
     let path = [];
-    if (this.player === 1) {
+    if (this.player === 0) {
       if (this.canAttack(board, ID + 7, ID, "L")) path.push(ID + 7);
       if (this.canAttack(board, ID + 9, ID, "R")) path.push(ID + 9);
 
