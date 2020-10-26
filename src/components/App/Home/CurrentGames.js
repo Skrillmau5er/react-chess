@@ -13,11 +13,7 @@ import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
 import "../../../styles/App/CurrentGames.scss";
 import { Skeleton } from "@material-ui/lab";
 import { toast } from "react-toastify";
-import {
-  getGamesByUser,
-  deleteGame as deleteGameById,
-  getUser,
-} from "../../../services";
+import { getGamesByUser, deleteGame as deleteGameById, getUser } from "../../../services";
 import moment from "moment";
 import DeleteGameModal from "./DeleteGameModal";
 
@@ -41,7 +37,7 @@ const CurrentGames = ({ history, uid }) => {
   };
 
   const setUpGames = (games) => {
-    games.map(async game => {
+    games.map(async (game) => {
       let opponent = await getPlayerName(game.gameData.players);
       game.opponent = opponent;
     });
@@ -70,16 +66,18 @@ const CurrentGames = ({ history, uid }) => {
   const getPlayerName = async (players) => {
     let opponent = players[0] === uid ? players[1] : players[0];
     let playerName;
-    await getUser(opponent)
-    .then(res => {
-      playerName = res.data.displayName;
-    })
-    .catch(err => {
-      toast.error(err.message);
-    })
-    .finally(() => {
-      return playerName;
-    })
+    if (opponent) {
+      await getUser(opponent)
+        .then((res) => {
+          playerName = res.data.displayName;
+        })
+        .catch((err) => {
+          toast.error(err.message);
+        })
+        .finally(() => {
+          return playerName;
+        });
+    }
   };
 
   const getTurn = (turn) => {
@@ -122,8 +120,7 @@ const CurrentGames = ({ history, uid }) => {
                           )}
                           {game.gameData.lastMove && (
                             <Typography className="font-xs align-right">
-                              Last Move {formatLastMove(game.gameData.lastMove)}{" "}
-                              ago
+                              Last Move {formatLastMove(game.gameData.lastMove)} ago
                             </Typography>
                           )}
                         </div>
@@ -156,32 +153,16 @@ const CurrentGames = ({ history, uid }) => {
         ) : (
           <Grid container spacing={1}>
             <Grid item xs={12} md={6} lg={4} xl={3}>
-              <Skeleton
-                height={130}
-                className="game-skeleton m-3"
-                variant={"rect"}
-              />
+              <Skeleton height={130} className="game-skeleton m-3" variant={"rect"} />
             </Grid>
             <Grid item xs={12} md={6} lg={4} xl={3}>
-              <Skeleton
-                height={130}
-                className="game-skeleton m-3"
-                variant={"rect"}
-              />
+              <Skeleton height={130} className="game-skeleton m-3" variant={"rect"} />
             </Grid>
             <Grid item xs={12} md={6} lg={4} xl={3}>
-              <Skeleton
-                height={130}
-                className="game-skeleton m-3"
-                variant={"rect"}
-              />
+              <Skeleton height={130} className="game-skeleton m-3" variant={"rect"} />
             </Grid>
             <Grid item xs={12} md={6} lg={4} xl={3}>
-              <Skeleton
-                height={130}
-                className="game-skeleton m-3"
-                variant={"rect"}
-              />
+              <Skeleton height={130} className="game-skeleton m-3" variant={"rect"} />
             </Grid>
           </Grid>
         )}

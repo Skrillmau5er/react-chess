@@ -11,11 +11,12 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import { auth } from "../../../services/firebase";
+import { auth, provider } from "../../../services/firebase";
 import "../../../styles/App/CreateUser.scss";
 import { createUser } from "../../../services";
 import { toast } from "react-toastify";
 import queryString from "query-string";
+import googleIcon from "../../../assets/google-icon.png";
 
 export default class CreateUserNew extends Component {
   state = {
@@ -52,6 +53,15 @@ export default class CreateUserNew extends Component {
         }
       }
     );
+  };
+
+  signInWithGoogle = (e) => {
+    e.preventDefault();
+    this.setState({ submitted: true, isLoading: true });
+    auth.signInWithPopup(provider).catch((err) => {
+      let errorMessage = err.message;
+      toast.error(errorMessage);
+    });
   };
 
   validate = () => {
@@ -93,13 +103,13 @@ export default class CreateUserNew extends Component {
     } else if (password2.length < 8) {
       validationPassed = false;
       this.setState({
-        password2Err: "Please enter a password atleast 8 characters long",
+        password2Err: "Please enter a password at least 8 characters long",
       });
     }
     return validationPassed;
   };
 
-  onSumbit = async (event) => {
+  onSubmit = async (event) => {
     event.preventDefault();
     this.setState({ submitted: true });
 
@@ -157,6 +167,21 @@ export default class CreateUserNew extends Component {
             <Typography component="h1" variant="h5">
               Create Quick Chess Acount
             </Typography>
+
+            {!queryString.parse(this.props.location.search).game_id && (
+              <Button
+                className="mt-2 mb-8"
+                type="submit"
+                fullWidth
+                variant="outlined"
+                color="primary"
+                disabled={isLoading}
+                onClick={(e) => this.signInWithGoogle(e)}
+              >
+                <img className="w-6 mr-3" src={googleIcon} alt="google-icon" />
+                Create Account With Google
+              </Button>
+            )}
             <form className="signup-form">
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -208,11 +233,7 @@ export default class CreateUserNew extends Component {
                     type="password"
                     id="password"
                     autoComplete="new-password"
-                    helperText={
-                      passwordErr
-                        ? passwordErr
-                        : "Password must be atleat 8 characters"
-                    }
+                    helperText={passwordErr ? passwordErr : "Password must be atleat 8 characters"}
                     error={passwordErr ? true : false}
                     onChange={(e) => this.change(e, "password")}
                   />
@@ -226,15 +247,9 @@ export default class CreateUserNew extends Component {
                     type="password"
                     id="password2"
                     autoComplete="new-password"
-                    error={
-                      password !== password2 || (password2Err ? true : false)
-                    }
+                    error={password !== password2 || (password2Err ? true : false)}
                     onChange={(e) => this.change(e, "password2")}
-                    helperText={
-                      password !== password2
-                        ? "Passwords do not match."
-                        : password2Err
-                    }
+                    helperText={password !== password2 ? "Passwords do not match." : password2Err}
                   />
                 </Grid>
               </Grid>
@@ -245,15 +260,15 @@ export default class CreateUserNew extends Component {
                 color="primary"
                 className="submit-button"
                 disabled={isLoading}
-                onClick={this.onSumbit}
+                onClick={this.onSubmit}
               >
-                Sign Up
+                Create Account
               </Button>
               <Grid container justify="flex-end">
                 <Grid item>
-                  <Link href="/" variant="body2">
+                  <Button href="/" size="small" color="primary">
                     Already have an account? Sign in
-                  </Link>
+                  </Button>
                 </Grid>
               </Grid>
             </form>

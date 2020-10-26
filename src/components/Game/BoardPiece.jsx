@@ -18,9 +18,9 @@ import classNames from "classnames";
 
 const BoardPiece = ({ piece, fallen, flip, lastMoveAnimation, lastPieceTaken }) => {
   const [animationStyle, setAnimationStyle] = useState(null);
+  const [lastPieceStyle, setLastPieceStyle] = useState(null);
 
   useEffect(() => {
-    console.log(lastMoveAnimation);
     getPieceImage();
     determineStyle();
   }, [lastMoveAnimation]);
@@ -63,28 +63,31 @@ const BoardPiece = ({ piece, fallen, flip, lastMoveAnimation, lastPieceTaken }) 
       setAnimationStyle(style);
       setTimeout(() => setAnimationStyle({ left: 0, top: 0 }), 1000);
     }
+
+    if (lastPieceTaken) {
+      setTimeout(
+        () =>
+          setLastPieceStyle({
+            display: "none",
+          }),
+        1600
+      );
+    }
   };
 
   return (
     <div className={classNames("board-piece-container", fallen && "fallen")}>
       <img
         style={animationStyle}
-        className={classNames(
-          "board-piece",
-          fallen && "fallen",
-          flip && "transform rotate-180"
-        )}
+        className={classNames("board-piece", fallen && "fallen", flip && "transform rotate-180")}
         src={getPieceImage(piece)}
         alt="chess piece"
       />
       {lastPieceTaken && (
         <img
-          className={classNames(
-            "board-piece",
-            fallen && "fallen",
-            flip && "transform rotate-180"
-          )}
-          src={getPieceImage(lastMoveAnimation.pieceTaken.piece)}
+          style={lastPieceStyle}
+          className={classNames("board-piece", fallen && "fallen", flip && "transform rotate-180")}
+          src={getPieceImage(lastPieceTaken)}
           alt="chess piece"
         />
       )}

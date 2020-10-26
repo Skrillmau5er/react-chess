@@ -100,13 +100,17 @@ const Game = ({ match, history, user, setHideMenu }) => {
     if (moves.length) {
       let lastMove = moves[moves.length - 1];
       let animationMove = animateMove(lastMove.to, lastMove.from);
-      let pieceTaken = lastMove?.pieceTaken && createPiece(lastMove.pieceTaken);
-
+      let pieceTaken = lastMove?.pieceTaken && createPiece(lastMove.pieceTaken.piece);
+      let pieceTakenID = -1;
+      if (pieceTaken) {
+        pieceTakenID = lastMove.pieceTaken.position;
+      }
       setLastMoveAnimation({
         currentPosition: lastMove.to,
         lastPosition: lastMove.from,
         animationMove,
         pieceTaken,
+        pieceTakenID,
       });
     }
   };
@@ -329,7 +333,7 @@ const Game = ({ match, history, user, setHideMenu }) => {
                   active={id === activePiece}
                   path={currentPath ? currentPath.includes(id) : false}
                   lastMoveAnimation={lastMoveAnimation?.currentPosition === id && lastMoveAnimation}
-                  lastPieceTaken={lastMoveAnimation?.pieceTaken?.position === id && lastMoveAnimation.pieceTaken}
+                  lastPieceTaken={lastMoveAnimation?.pieceTakenID === id && lastMoveAnimation.pieceTaken}
                 />
               );
             })}

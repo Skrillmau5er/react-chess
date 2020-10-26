@@ -1,12 +1,5 @@
 import React, { Component } from "react";
-import {
-  Button,
-  TextField,
-  LinearProgress,
-  Paper,
-  Grid,
-  Typography,
-} from "@material-ui/core";
+import { Button, TextField, LinearProgress, Paper, Grid, Typography } from "@material-ui/core";
 import "../../../styles/App/Login.scss";
 import { toast } from "react-toastify";
 import { auth, provider } from "../../../services/firebase";
@@ -105,16 +98,18 @@ export default class LoginNew extends Component {
         isLoading: true,
         displayError: false,
       });
-      auth.signInWithEmailAndPassword(email, password)
-      .then(() => {
-        toast.dismiss();
-      }).catch((err) => {
-        this.setState({
-          isLoading: false,
+      auth
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          toast.dismiss();
+        })
+        .catch((err) => {
+          this.setState({
+            isLoading: false,
+          });
+          toast.error("Sign in falied");
+          console.log(err);
         });
-        toast.error("Sign in falied");
-        console.log(err);
-      });
     }
   };
 
@@ -152,13 +147,7 @@ export default class LoginNew extends Component {
       <>
         {isLoading && <LinearProgress style={{ height: "5px" }} />}
         <Modal open={showForgotPassword} onClose={this.closeForgotPassword}>
-          <Grid
-            container
-            component={Paper}
-            elevation={6}
-            alignContent="center"
-            className="p-6"
-          >
+          <Grid container component={Paper} elevation={6} alignContent="center" className="p-6">
             <Grid item xs={12}>
               <Typography component="div" variant="h5">
                 Forgot Password
@@ -173,9 +162,7 @@ export default class LoginNew extends Component {
                 autoComplete="email"
                 onChange={(e) => this.setState({ emailForgot: e.target.value })}
                 helperText={
-                  emailForgotErr
-                    ? emailForgotErr
-                    : "We will send you an email with a link to reset your password"
+                  emailForgotErr ? emailForgotErr : "We will send you an email with a link to reset your password"
                 }
                 fullWidth
                 error={emailForgotErr ? true : false}
@@ -231,8 +218,7 @@ export default class LoginNew extends Component {
                 />
                 {displayError && (
                   <Typography className="login-error" variant="body2" s>
-                    It looks like that didn't work. Try again, click Forgot
-                    Password, or Sign Up.
+                    It looks like that didn't work. Try again, click Forgot Password, or Create an Account.
                   </Typography>
                 )}
                 <Button
@@ -255,32 +241,18 @@ export default class LoginNew extends Component {
                   disabled={isLoading}
                   onClick={(e) => this.signInWithGoogle(e)}
                 >
-                  <img
-                    className="google-icon"
-                    src={googleIcon}
-                    alt="google-icon"
-                  />
+                  <img className="w-6 mr-3" src={googleIcon} alt="google-icon" />
                   Sign In With Google
                 </Button>
                 <Grid container>
                   <Grid item xs>
-                    <Button
-                      onClick={() =>
-                        this.setState({ showForgotPassword: true })
-                      }
-                      color="primary"
-                      size="small"
-                    >
+                    <Button onClick={() => this.setState({ showForgotPassword: true })} color="primary" size="small">
                       Forgot password?
                     </Button>
                   </Grid>
                   <Grid item>
-                    <Button
-                      onClick={() => this.props.history.push("/createUser")}
-                      color="primary"
-                      size="small"
-                    >
-                      {"Sign Up"}
+                    <Button onClick={() => this.props.history.push("/createUser")} color="primary" size="small">
+                      Create Account
                     </Button>
                   </Grid>
                 </Grid>
