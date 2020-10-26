@@ -294,7 +294,9 @@ const Game = ({ match, history, user, setHideMenu }) => {
     setShowGameMenu(false);
   };
 
-  const flipBoard = () => (whatIfMode || developEnv ? user.uid === players[0] : players[turn] === players[0]);
+  const flipBoard = () => {
+    return (whatIfMode || developEnv ? user.uid === players[0] : user.uid === players[0])
+  };
 
   return (
     <div className="game-container">
